@@ -1,0 +1,1656 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>工程力学作业讲解</title>
+<meta name="description" content="工程力学 P27 平面汇交力系、P36 平面力偶系共 11 题的分步动画讲解">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+:root{
+  --bg:#f4f2eb; --card:#fffdf7; --ink:#23221e; --ink2:#4b4840; --muted:#857f72; --rule:#dcd6c8; --soft:#ece8dd;
+  --known:#c1432a; --unk:#2b5f88; --res:#2f7a4c; --geo:#9b9486; --hl:#a8730c; --axis:#6d685e;
+  --sans:"Noto Sans SC","Source Han Sans SC","PingFang SC","Hiragino Sans GB","DengXian",sans-serif;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","SimSun",serif;
+  --math:"Times New Roman","STIX Two Text","Noto Serif SC","Songti SC",serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1916; --card:#23221e; --ink:#ece8de; --ink2:#c8c3b6; --muted:#8f897c; --rule:#3b3933; --soft:#2c2b26;
+    --known:#f07a5a; --unk:#74a9d8; --res:#5fc28c; --geo:#7f7a6e; --hl:#e0ad48; --axis:#a8a294;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a1916; --card:#23221e; --ink:#ece8de; --ink2:#c8c3b6; --muted:#8f897c; --rule:#3b3933; --soft:#2c2b26;
+  --known:#f07a5a; --unk:#74a9d8; --res:#5fc28c; --geo:#7f7a6e; --hl:#e0ad48; --axis:#a8a294;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:15.5px/1.8 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+
+/* 顶栏 */
+.top{display:flex;align-items:center;gap:18px;padding:14px 28px;border-bottom:1px solid var(--rule);background:var(--bg)}
+.top h1{font:700 19px/1.3 var(--serif);margin:0;letter-spacing:.03em}
+.top .sub{color:var(--muted);font-size:13px;flex:1}
+.top .theme{background:none;border:1px solid var(--rule);padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--ink2)}
+
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr)}
+.side{border-right:1px solid var(--rule);padding:10px 0 40px;position:sticky;top:0;height:100vh;overflow:auto}
+.side h4{font:600 12px var(--sans);color:var(--muted);letter-spacing:.1em;margin:18px 22px 4px}
+.side a{display:flex;gap:8px;align-items:baseline;padding:6px 18px 6px 19px;color:var(--ink2);text-decoration:none;font-size:14px;border-left:3px solid transparent;line-height:1.5}
+.side a .no{font:600 13.5px var(--math);color:var(--muted);min-width:22px}
+.side a:hover{background:var(--soft)}
+.side a.on{background:var(--soft);border-left-color:var(--known);color:var(--ink)}
+.side a.on .no{color:var(--known)}
+main{padding:30px 44px 90px;max-width:1320px;min-width:0}
+
+/* 题目头 */
+.tag{font-size:12.5px;color:var(--muted);letter-spacing:.06em}
+.ph h2{font:700 27px/1.35 var(--serif);margin:4px 0 14px}
+.orig{border-left:3px solid var(--rule);padding:2px 0 2px 14px;color:var(--ink2);font-size:14.5px;margin:0 0 12px;max-width:900px}
+.orig .chg{color:var(--known);font-weight:600}
+.given{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;font-size:14.5px;max-width:900px}
+.given b{font-weight:600;color:var(--muted);font-size:12.5px;letter-spacing:.08em;padding-top:2px}
+
+.know{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:22px 0 28px}
+.kc{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--hl);padding:11px 16px 12px}
+.kc h5{margin:0 0 3px;font:600 14.5px var(--sans)}
+.kc p{margin:0;font-size:14px;color:var(--ink2);line-height:1.75}
+
+/* 图 + 步骤 */
+.stage{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:28px;align-items:start}
+.fig{position:sticky;top:14px;background:var(--card);border:1px solid var(--rule)}
+.fig svg.dg{display:block;width:100%;height:auto;touch-action:manipulation}
+.vtabs{display:flex;border-bottom:1px solid var(--rule)}
+.vtabs button{flex:1;padding:8px 6px;border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;color:var(--muted);font-size:14px}
+.vtabs button.on{color:var(--ink);border-bottom-color:var(--known);font-weight:600}
+.figbar{display:flex;align-items:center;gap:8px;border-top:1px solid var(--rule);padding:8px 12px;flex-wrap:wrap}
+.btn{background:none;border:1px solid var(--rule);color:var(--ink);padding:4px 12px;font-size:13.5px;cursor:pointer;line-height:1.6}
+.btn:hover{border-color:var(--ink2)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.pri{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.stepno{font:600 14px var(--math);color:var(--ink2);min-width:58px;text-align:center}
+.dots{display:flex;gap:4px;margin-left:auto}
+.dots i{width:16px;height:4px;background:var(--rule);cursor:pointer}
+.dots i.on{background:var(--known)}
+.ctrl{padding:8px 14px 10px;border-top:1px solid var(--rule);display:grid;gap:4px;font-size:13.5px}
+.ctrl:empty{display:none}
+.ctrl label{display:flex;justify-content:space-between;color:var(--ink2)}
+.ctrl label span:last-child{font-family:var(--math);color:var(--ink)}
+.ctrl input[type=range]{width:100%;accent-color:var(--known);margin:0}
+.readout{font-size:13.5px;color:var(--ink2);line-height:1.7}
+.readout b{color:var(--res);font-weight:600}
+.legend{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);padding:7px 12px;border-top:1px solid var(--rule)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend span i{display:inline-block;width:18px;height:3px}
+
+.steps{list-style:none;margin:0;padding:0}
+.steps li{position:relative;padding:13px 16px 14px 54px;border:1px solid transparent;border-bottom-color:var(--rule);cursor:pointer;transition:background .25s,opacity .25s}
+.steps li .n{position:absolute;left:14px;top:15px;width:26px;height:26px;border:1.5px solid var(--muted);font:600 13.5px/23px var(--math);text-align:center;color:var(--muted)}
+.steps li.on{background:var(--card);border-color:var(--rule);border-left:3px solid var(--known);padding-left:52px}
+.steps li.on .n{background:var(--known);border-color:var(--known);color:#fff}
+.steps li.later{opacity:.45}
+.steps li.later:hover{opacity:.8}
+.steps h4{margin:0 0 3px;font:600 15.5px/1.5 var(--sans)}
+.steps .bd{font-size:14.5px;color:var(--ink2)}
+.steps .bd p{margin:4px 0}
+
+/* 公式 */
+.mx{font-family:var(--math);font-size:1.07em;white-space:nowrap}
+.mx i,.eq i,.wl i{font-style:italic}
+.eq{font-family:var(--math);font-size:16.5px;margin:7px 0;padding:6px 12px;background:var(--soft);border-left:2px solid var(--geo);overflow-x:auto;white-space:nowrap;line-height:2.1;color:var(--ink)}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;font-size:.9em;line-height:1.25}
+.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 3px 1px}
+.fr>span:last-child{padding:1px 3px 0}
+.sqrt{white-space:nowrap}
+.sqrt .rad{border-top:1px solid currentColor;padding:0 2px;margin-left:1px}
+sub,sup{font-size:.7em;line-height:0}
+.tip{font-size:13.5px;margin-top:8px;padding:5px 10px;border-left:2px solid var(--hl);color:var(--ink2);background:color-mix(in srgb,var(--hl) 9%,transparent)}
+.tip b{color:var(--hl)}
+
+/* 作业本写法 */
+.blk{margin-top:36px}
+.blk>h3{font:700 18px var(--serif);margin:0 0 10px;display:flex;align-items:center;gap:12px}
+.blk>h3 .btn{font:13px var(--sans);margin-left:auto}
+.write{background:var(--card);border:1px solid var(--rule);padding:16px 24px 16px 46px;position:relative;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 39px,var(--rule) 39px,var(--rule) 40px);background-position:0 15px}
+.write::before{content:"";position:absolute;left:28px;top:0;bottom:0;border-left:1px solid color-mix(in srgb,var(--known) 45%,transparent)}
+.wl{min-height:40px;line-height:40px;font-size:15.5px;font-family:var(--math),var(--sans);white-space:nowrap;overflow-x:auto;overflow-y:hidden}
+.wl .fr{line-height:1.15;font-size:.85em}
+.wl.zh{font-family:var(--sans);white-space:normal;line-height:40px}
+.ans{border:2px solid var(--res);padding:12px 18px;margin-top:18px;background:color-mix(in srgb,var(--res) 6%,var(--card))}
+.ans b{color:var(--res);font-weight:700;letter-spacing:.1em;margin-right:10px}
+.pit{margin:18px 0 0;padding:0;list-style:none}
+.pit li{padding:6px 0 6px 26px;position:relative;color:var(--ink2);font-size:14.5px;border-bottom:1px dashed var(--rule)}
+.pit li::before{content:"!";position:absolute;left:4px;top:7px;width:15px;height:15px;border:1.5px solid var(--known);color:var(--known);font:700 11px/12px var(--sans);text-align:center}
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:40px;border-top:1px solid var(--rule);padding-top:16px}
+.pn a{text-decoration:none;font-size:14px;color:var(--ink2);max-width:48%}
+.pn a:hover{color:var(--known)}
+.pn small{display:block;color:var(--muted);font-size:12px}
+
+/* SVG 图元 */
+.dg text{user-select:none}
+.ln{stroke:var(--ink);stroke-width:1.6;fill:none}
+.frm{stroke:var(--ink);stroke-width:3;fill:none;stroke-linejoin:miter}
+.rope{stroke:var(--ink);stroke-width:1.8;fill:none}
+.dsh{stroke:var(--geo);stroke-width:1.3;stroke-dasharray:6 5;fill:none}
+.dsh.r{stroke:var(--res)}
+.dsh.h{stroke:var(--hl);stroke-width:1.6}
+.dd{stroke:var(--geo);stroke-width:1.2;stroke-dasharray:12 4 2 4;fill:none}
+.rodO{stroke:var(--ink);stroke-width:10;fill:none;stroke-linejoin:miter;stroke-linecap:butt}
+.rodI{stroke:var(--card);stroke-width:6;fill:none;stroke-linejoin:miter;stroke-linecap:butt}
+.rod{transition:opacity .5s}
+.hot .rodO{stroke:var(--hl);animation:hotp 1.2s ease-in-out infinite}
+.hot .rodI{stroke:color-mix(in srgb,var(--hl) 22%,var(--card))}
+.hot.cplg{--fc:var(--hl)}
+@keyframes hotp{50%{stroke-width:12}}
+.pinc{fill:var(--card);stroke:var(--ink);stroke-width:1.6}
+.sup{fill:var(--card);stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.gl{stroke:var(--ink);stroke-width:1.6}
+.ht{stroke:var(--ink);stroke-width:1}
+.body{fill:var(--card);stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
+.inkf{fill:var(--ink)}
+.arc{stroke:var(--hl);stroke-width:1.4;fill:none}
+.arcT{fill:var(--hl);font:italic 15px var(--math)}
+.arc.r{stroke:var(--res)}.arcT.r{fill:var(--res)}
+.lb{font:italic 18px var(--math);fill:var(--ink)}
+.lb .sb{font-style:normal;font-size:12.5px}
+.pt{font:italic 17px var(--math);fill:var(--ink)}
+.nt{font:13px var(--sans);fill:var(--muted)}
+.nt.r{fill:var(--res);font-weight:600}
+.big{font:600 17px var(--math);fill:var(--res)}
+.vl{font:12.5px var(--sans);fill:var(--fc)}
+.dm{stroke:var(--muted);stroke-width:1}
+.dmh{fill:var(--muted)}
+.dmt{font:italic 15px var(--math);fill:var(--ink2)}
+.rtm{stroke:var(--hl);stroke-width:1.3;fill:none}
+.focus{stroke:var(--hl);stroke-width:1.6;stroke-dasharray:4 3;fill:none}
+
+.arw{--fc:var(--known)}
+.arw.u{--fc:var(--unk)}
+.arw.r{--fc:var(--res)}
+.arw.g{--fc:var(--geo)}
+.arw.ax{--fc:var(--axis)}
+.arw line{stroke:var(--fc);stroke-width:2.6;stroke-linecap:round}
+.arw.ax line{stroke-width:1.2}
+.arw line.dsl{stroke-dasharray:6 4;stroke-width:2}
+.arw path{fill:var(--fc)}
+.arw .lb{fill:var(--fc)}
+.arw.ax .lb{font-size:15px}
+.cplg{--fc:var(--known)}
+.cplg.r{--fc:var(--res)}
+.cplg.u{--fc:var(--unk)}
+.hole{fill:var(--bg);stroke:var(--ink);stroke-width:1.2}
+.rm{font-style:normal}
+.kdot{fill:var(--hl)}
+.cpl{stroke:var(--fc);fill:none;stroke-width:2.4}
+.cplh{fill:var(--fc)}
+.cplt{fill:var(--fc)}
+
+/* 分步显隐 */
+[data-s]{opacity:0;transition:opacity .5s ease}
+[data-s].on{opacity:1}
+.arw[data-s]{transform:scale(.04);transition:transform .7s cubic-bezier(.2,.8,.25,1),opacity .3s}
+.arw[data-s].on{transform:none}
+[data-tk]{transition:transform 1s cubic-bezier(.4,0,.2,1)}
+[data-dk]{transition:opacity .5s}
+.dim{opacity:.16 !important}
+.instant,.instant *{transition:none !important}
+.spin{animation:spin linear infinite}
+.spin.ccw{animation-name:spinccw}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinccw{to{transform:rotate(-360deg)}}
+.paused .spin{animation-play-state:paused}
+@media (prefers-reduced-motion: reduce){
+  [data-s],.arw[data-s],[data-tk]{transition-duration:.01s !important}
+  .spin{animation:none}
+  .hot .rodO{animation:none}
+}
+
+/* 入门页、汇总页 */
+.lead{font-size:15.5px;color:var(--ink2);max-width:860px}
+.pr{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px;margin-top:22px}
+.prc{background:var(--card);border:1px solid var(--rule);padding:16px 20px 18px}
+.prc h3{font:700 17px var(--serif);margin:0 0 6px}
+.prc p{margin:6px 0;font-size:14.5px;color:var(--ink2)}
+.prc svg{display:block;width:100%;height:auto;margin:6px 0}
+.prc.wide{grid-column:1/-1}
+.cons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cons figure{margin:0;border:1px solid var(--rule);padding:6px 8px 8px;background:var(--bg)}
+.cons figcaption{font-size:13px;color:var(--ink2);line-height:1.6}
+.cons figcaption b{display:block;color:var(--ink);font-size:14px}
+.four{margin:6px 0 0;padding-left:0;list-style:none;counter-reset:f}
+.four li{counter-increment:f;padding:6px 0 6px 36px;position:relative;font-size:14.5px;color:var(--ink2);border-bottom:1px dashed var(--rule)}
+.four li::before{content:counter(f);position:absolute;left:0;top:7px;width:24px;height:24px;background:var(--ink);color:var(--card);font:600 13px/24px var(--math);text-align:center}
+.four li b{color:var(--ink)}
+table.sum{width:100%;border-collapse:collapse;margin-top:16px;font-size:14.5px;background:var(--card)}
+table.sum th,table.sum td{border:1px solid var(--rule);padding:9px 12px;text-align:left;vertical-align:top}
+table.sum th{background:var(--soft);font-weight:600;font-size:13px;color:var(--ink2);letter-spacing:.05em}
+table.sum td:first-child{white-space:nowrap;font-family:var(--math);font-weight:600}
+table.sum a{text-decoration:none;border-bottom:1px solid var(--rule)}
+table.sum a:hover{color:var(--known)}
+.kbd{font:12px var(--math);border:1px solid var(--rule);padding:0 5px;background:var(--card)}
+
+@media (max-width: 960px){
+  .top{padding:10px 16px}
+  .top .sub{display:none}
+  .shell{grid-template-columns:1fr}
+  .side{position:sticky;top:0;height:auto;display:flex;overflow-x:auto;padding:0;border-right:none;border-bottom:1px solid var(--rule);background:var(--bg);z-index:6;scrollbar-width:none}
+  .side::-webkit-scrollbar{display:none}
+  .side h4{display:none}
+  .side a{border-left:none;border-bottom:3px solid transparent;white-space:nowrap;padding:9px 11px 7px}
+  .side a .t{display:none}
+  .side a.on{border-bottom-color:var(--known)}
+  main{padding:18px 16px 90px}
+  .ph h2{font-size:21px}
+  .stage{grid-template-columns:1fr;gap:14px}
+  .fig{position:sticky;top:44px;z-index:4}
+  .fig .legend{display:none}
+  .pr{grid-template-columns:1fr}
+  .cons{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .write{padding:12px 14px 12px 34px}
+  .write::before{left:20px}
+}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>工程力学作业讲解</h1>
+  <span class="sub">P27 平面汇交力系 7 题 · P36 平面力偶系 4 题 · 第 11 题按老师要求取 F₁ = 100 kN</span>
+  <button class="theme" id="theme">主题</button>
+</header>
+<div class="shell">
+  <nav class="side" id="nav"></nav>
+  <main id="main"></main>
+</div>
+<script>
+'use strict';
+/* ========== 数学与格式 ========== */
+const RAD = Math.PI / 180;
+const f = n => Math.round(n * 10) / 10;
+// 数学角（度，逆时针为正）→ 屏幕坐标
+const pol = (x, y, l, d) => [x + l * Math.cos(d * RAD), y - l * Math.sin(d * RAD)];
+
+function at(o) {
+  if (!o) return '';
+  let s = '';
+  if (o.s != null) s += ` data-s="${o.s}"`;
+  else if (o.u != null) s += ` data-s="0"`;
+  if (o.u != null) s += ` data-u="${o.u}"`;
+  if (o.tk != null) s += ` data-tk="${o.tk}" data-tf="${o.tf}"`;
+  if (o.dk != null) s += ` data-dk="${o.dk}"` + (o.du != null ? ` data-du="${o.du}"` : '');
+  if (o.hk != null) s += ` data-hk="${o.hk}"`;
+  if (o.style) s += ` style="${o.style}"`;
+  return s;
+}
+// 标签：F_AB → F 加下标
+function lab(t) {
+  return String(t).replace(/([A-Za-zθβγαφ])_\{([^}]*)\}|([A-Za-zθβγαφ])_([A-Za-z0-9′']+)/g,
+    (m, a, b, c, d) => `${a || c}<tspan class="sb" dy="5">${b || d}</tspan><tspan dy="-5">​</tspan>`);
+}
+
+/* 简易公式：$...$ 行内，$$...$$ 独立行；#frac{}{}、#sqrt{}、#t{直立}、_ 下标、^ 上标 */
+function tex(s, up) {
+  let out = '', i = 0;
+  const group = () => {
+    while (s[i] === ' ') i++;
+    if (s[i] === '{') {
+      let d = 0, j = i;
+      for (; j < s.length; j++) { if (s[j] === '{') d++; else if (s[j] === '}') { d--; if (!d) break; } }
+      const r = s.slice(i + 1, j); i = j + 1; return r;
+    }
+    return s[i++] || '';
+  };
+  while (i < s.length) {
+    const c = s[i];
+    if (c === '#') {
+      const m = /^#([a-z]+)/.exec(s.slice(i));
+      if (m) {
+        i += m[0].length;
+        if (m[1] === 'frac') { const a = group(), b = group(); out += `<span class="fr"><span>${tex(a, up)}</span><span>${tex(b, up)}</span></span>`; }
+        else if (m[1] === 'sqrt') { const a = group(); out += `<span class="sqrt">√<span class="rad">${tex(a, up)}</span></span>`; }
+        else if (m[1] === 't') { out += group(); }
+        continue;
+      }
+    }
+    if (c === '_' || c === '^') { i++; const a = group(); out += c === '_' ? `<sub>${tex(a, true)}</sub>` : `<sup>${tex(a, up)}</sup>`; continue; }
+    if (/[A-Za-z]/.test(c)) {
+      let j = i; while (j < s.length && /[A-Za-z]/.test(s[j])) j++;
+      const w = s.slice(i, j); i = j;
+      const fm = /^([A-Za-z])(sin|cos|tan)$/.exec(w);
+      if (fm && !up) { out += `<i>${fm[1]}</i>${fm[2]}`; continue; }
+      out += (w.length === 1 && !up) ? `<i>${w}</i>` : w; continue;
+    }
+    if ('θβγαφ'.includes(c) && !up) { out += `<i>${c}</i>`; i++; continue; }
+    if (c === '-') { out += '−'; i++; continue; }
+    if (c === '*') { out += '×'; i++; continue; }
+    if (c === '<') { out += '&lt;'; i++; continue; }
+    out += c; i++;
+  }
+  return out;
+}
+// 公式转成纯文本，给"复制文字"用
+function texPlain(s) {
+  let out = '', i = 0;
+  const sup = { '2': '²', '3': '³' };
+  const group = () => {
+    while (s[i] === ' ') i++;
+    if (s[i] === '{') { let d = 0, j = i; for (; j < s.length; j++) { if (s[j] === '{') d++; else if (s[j] === '}') { d--; if (!d) break; } } const r = s.slice(i + 1, j); i = j + 1; return r; }
+    return s[i++] || '';
+  };
+  const wrap = x => /^(\d+(\.\d+)?|[A-Za-zθαβγ][A-Za-z0-9′]{0,2}|√\d+)$/.test(x) ? x : '(' + x + ')';
+  while (i < s.length) {
+    const c = s[i];
+    const m = c === '#' && /^#([a-z]+)/.exec(s.slice(i));
+    if (m) {
+      i += m[0].length;
+      if (m[1] === 'frac') { const a = texPlain(group()), b = texPlain(group()); out += wrap(a) + '/' + wrap(b); }
+      else if (m[1] === 'sqrt') out += '√' + wrap(texPlain(group()));
+      else out += group();
+      continue;
+    }
+    if (c === '_') { i++; out += texPlain(group()); continue; }
+    if (c === '^') { i++; const a = texPlain(group()); out += sup[a] || '^' + a; continue; }
+    out += c === '-' ? '−' : c === '*' ? '×' : c; i++;
+  }
+  return out;
+}
+function plainLine(h) { return String(h).replace(/\$\$?([^$]+?)\$\$?/g, (m, a) => texPlain(a)).replace(/<[^>]+>/g, ''); }
+function T(h) {
+  if (!h) return '';
+  return String(h)
+    .replace(/\$\$([\s\S]+?)\$\$/g, (m, a) => `<div class="eq">${tex(a.trim())}</div>`)
+    .replace(/\$([^$]+?)\$/g, (m, a) => `<span class="mx">${tex(a)}</span>`);
+}
+
+/* ========== SVG 图元 ========== */
+const D = {
+  g: (c, o = {}, cls = '') => `<g${cls ? ` class="${cls}"` : ''}${at(o)}>${c}</g>`,
+  ln: (x1, y1, x2, y2, cls = 'ln', o = {}) => `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" class="${cls}"${at(o)}/>`,
+  pl: (pts, cls = 'ln', o = {}) => `<polyline points="${pts.map(p => f(p[0]) + ',' + f(p[1])).join(' ')}" class="${cls}"${at(o)}/>`,
+  rod(pts, o = {}) {
+    const P = pts.map(p => f(p[0]) + ',' + f(p[1])).join(' ');
+    return `<g class="rod${o.cls ? ' ' + o.cls : ''}"${at(o)}><polyline points="${P}" class="rodO"/><polyline points="${P}" class="rodI"/></g>`;
+  },
+  pin: (x, y, o = {}) => `<circle cx="${f(x)}" cy="${f(y)}" r="${o.r || 5}" class="pinc"${at(o)}/>`,
+  hatch(x1, y1, x2, y2, side = 1, o = {}) {
+    const L = Math.hypot(x2 - x1, y2 - y1), dx = (x2 - x1) / L, dy = (y2 - y1) / L, nx = -dy * side, ny = dx * side;
+    let s = `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" class="gl"/>`;
+    const n = Math.max(2, Math.floor(L / 8));
+    for (let i = 0; i <= n; i++) {
+      const px = x1 + dx * (i * L / n), py = y1 + dy * (i * L / n);
+      s += `<line x1="${f(px)}" y1="${f(py)}" x2="${f(px + nx * 7 - dx * 6)}" y2="${f(py + ny * 7 - dy * 6)}" class="ht"/>`;
+    }
+    return D.g(s, o);
+  },
+  // 固定铰支座：rot 为屏幕旋转角（顺时针为正）
+  fixed(x, y, rot = 0, o = {}) {
+    let s = `<path d="M${x},${y} L${x - 13},${y + 22} L${x + 13},${y + 22} Z" class="sup"/>` + D.hatch(x - 22, y + 22, x + 22, y + 22, 1) + `<circle cx="${x}" cy="${y}" r="5" class="pinc"/>`;
+    return `<g transform="rotate(${rot} ${x} ${y})"${at(o)}>${s}</g>`;
+  },
+  roller(x, y, rot = 0, o = {}) {
+    let s = `<path d="M${x},${y} L${x - 12},${y + 15} L${x + 12},${y + 15} Z" class="sup"/><circle cx="${x - 7}" cy="${y + 19.5}" r="4" class="pinc"/><circle cx="${x + 7}" cy="${y + 19.5}" r="4" class="pinc"/>` + D.hatch(x - 22, y + 24, x + 22, y + 24, 1) + `<circle cx="${x}" cy="${y}" r="5" class="pinc"/>`;
+    return `<g transform="rotate(${rot} ${x} ${y})"${at(o)}>${s}</g>`;
+  },
+  txt: (x, y, t, cls = 'pt', o = {}) => `<text x="${f(x)}" y="${f(y)}" class="${cls}" text-anchor="${o.a || 'middle'}"${at(o)}>${lab(t)}</text>`,
+  note: (x, y, t, o = {}) => `<text x="${f(x)}" y="${f(y)}" class="nt${o.c ? ' ' + o.c : ''}" text-anchor="${o.a || 'middle'}"${at(o)}>${t}</text>`,
+  arc(cx, cy, r, a1, a2, label, o = {}) {
+    const [x1, y1] = pol(cx, cy, r, a1), [x2, y2] = pol(cx, cy, r, a2);
+    const big = Math.abs(a2 - a1) > 180 ? 1 : 0, sweep = a2 > a1 ? 0 : 1;
+    let s = `<path d="M${f(x1)},${f(y1)} A${r},${r} 0 ${big} ${sweep} ${f(x2)},${f(y2)}" class="arc ${o.c || ''}"/>`;
+    if (label) {
+      const m = o.am != null ? o.am : (a1 + a2) / 2;
+      const [lx, ly] = o.lp || pol(cx, cy, r + (o.lo || 15), m);
+      s += `<text x="${f(lx)}" y="${f(ly + 5)}" class="arcT ${o.c || ''}" text-anchor="middle">${lab(label)}</text>`;
+    }
+    return D.g(s, o);
+  },
+  // 力偶：cw=true 顺时针。可用 o.a1/o.a2 指定弧的起止（数学角）
+  couple(cx, cy, r, cw, label, o = {}) {
+    const a1 = o.a1 != null ? o.a1 : (cw ? 215 : -35), a2 = o.a2 != null ? o.a2 : (cw ? -35 : 215);
+    const [x1, y1] = pol(cx, cy, r, a1), [x2, y2] = pol(cx, cy, r, a2);
+    const span = Math.abs(a2 - a1);
+    let s = `<path d="M${f(x1)},${f(y1)} A${r},${r} 0 ${span > 180 ? 1 : 0} ${cw ? 1 : 0} ${f(x2)},${f(y2)}" class="cpl"/>`;
+    const tx = cw ? Math.sin(a2 * RAD) : -Math.sin(a2 * RAD), ty = cw ? Math.cos(a2 * RAD) : -Math.cos(a2 * RAD);
+    const h = 12, w = 5.5, bx = x2 - tx * h * 0.6, by = y2 - ty * h * 0.6, ex = x2 + tx * h * 0.4, ey = y2 + ty * h * 0.4;
+    s += `<path d="M${f(ex)},${f(ey)} L${f(bx - ty * w)},${f(by + tx * w)} L${f(bx + ty * w)},${f(by - tx * w)} Z" class="cplh"/>`;
+    if (label) { const [lx, ly] = o.lp || [cx, cy - r - 9]; s += `<text x="${f(lx)}" y="${f(ly)}" class="lb cplt" text-anchor="middle">${lab(label)}</text>`; }
+    return D.g(s, o, 'cplg ' + (o.c || 'k'));
+  },
+  arrow(x1, y1, x2, y2, o = {}) {
+    const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, h = o.h || 14, w = o.w || 5.5;
+    const bx = x2 - ux * h, by = y2 - uy * h;
+    let s = `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(bx + ux * 2)}" y2="${f(by + uy * 2)}"${o.dash ? ' class="dsl"' : ''}/><path d="M${f(x2)},${f(y2)} L${f(bx - uy * w)},${f(by + ux * w)} L${f(bx + uy * w)},${f(by - ux * w)} Z"/>`;
+    if (o.l) {
+      const [lx, ly] = o.lp || [x2 + ux * 12 - uy * 14, y2 + uy * 12 + ux * 14 + 5];
+      s += `<text x="${f(lx)}" y="${f(ly)}" class="lb" text-anchor="${o.la || 'middle'}">${lab(o.l)}</text>`;
+    }
+    if (o.v) { const [vx, vy] = o.vp; s += `<text x="${f(vx)}" y="${f(vy)}" class="vl" text-anchor="${o.va || 'middle'}">${o.v}</text>`; }
+    const oo = Object.assign({}, o, { style: `transform-origin:${f(x1)}px ${f(y1)}px` + (o.style ? ';' + o.style : '') });
+    return `<g class="arw ${o.c || 'k'}"${at(oo)}>${s}</g>`;
+  },
+  // 从点出发的力
+  af(x, y, len, deg, o = {}) { const g = o.g || 0; const [sx, sy] = pol(x, y, g, deg), [ex, ey] = pol(x, y, g + len, deg); return D.arrow(sx, sy, ex, ey, o); },
+  // 指向点的力（箭头尖在点上）
+  ai(x, y, len, deg, o = {}) { const g = o.g != null ? o.g : 7; const [sx, sy] = pol(x, y, g + len, deg + 180), [ex, ey] = pol(x, y, g, deg + 180); return D.arrow(sx, sy, ex, ey, o); },
+  dim(x1, y1, x2, y2, label, o = {}) {
+    const L = Math.hypot(x2 - x1, y2 - y1), dx = (x2 - x1) / L, dy = (y2 - y1) / L, h = 8, w = 3;
+    const head = (x, y, sx, sy) => `<path d="M${f(x)},${f(y)} L${f(x - sx * h - sy * w)},${f(y - sy * h + sx * w)} L${f(x - sx * h + sy * w)},${f(y - sy * h - sx * w)} Z" class="dmh"/>`;
+    const nx = -dy, ny = dx;
+    let s = `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" class="dm"/>` + head(x2, y2, dx, dy) + head(x1, y1, -dx, -dy);
+    s += `<line x1="${f(x1 + nx * 7)}" y1="${f(y1 + ny * 7)}" x2="${f(x1 - nx * 7)}" y2="${f(y1 - ny * 7)}" class="dm"/><line x1="${f(x2 + nx * 7)}" y1="${f(y2 + ny * 7)}" x2="${f(x2 - nx * 7)}" y2="${f(y2 - ny * 7)}" class="dm"/>`;
+    const off = o.off != null ? o.off : -12;
+    const mx = (x1 + x2) / 2 + nx * off, my = (y1 + y2) / 2 + ny * off;
+    s += `<text x="${f(mx)}" y="${f(my + 5)}" class="dmt" text-anchor="middle">${lab(label)}</text>`;
+    return D.g(s, o);
+  },
+  rt(x, y, d1, d2, sz = 10, o = {}) {
+    const [ax, ay] = pol(x, y, sz, d1), [cx, cy] = pol(x, y, sz, d2);
+    return D.pl([[ax, ay], [ax + cx - x, ay + cy - y], [cx, cy]], 'rtm', o);
+  },
+  axes(x, y, o = {}) {
+    const L = o.len || 100, B = o.back || 20, r = o.rot || 0;
+    const ax = (d, lb) => { const [sx, sy] = pol(x, y, B, d + 180), [ex, ey] = pol(x, y, L, d); const [lx, ly] = pol(x, y, L + 13, d); return D.arrow(sx, sy, ex, ey, { c: 'ax', h: 10, w: 4, l: lb, lp: [lx, ly + 5] }); };
+    return D.g(ax(r, o.lx || 'x') + ax(r + 90, o.ly || 'y'), o);
+  }
+};
+
+/* ========== 题目注册与渲染 ========== */
+const PROBS = [];
+const reg = p => PROBS.push(p);
+const S = { p: null, vi: 0, cur: 0, params: {}, timer: null };
+const $ = sel => document.querySelector(sel);
+
+function legendHTML() {
+  return `<div class="legend"><span><i style="background:var(--known)"></i>已知的力</span><span><i style="background:var(--unk)"></i>待求的力</span><span><i style="background:var(--res)"></i>算出来的结果</span><span><i style="background:var(--geo)"></i>辅助线</span></div>`;
+}
+
+function renderProb(p) {
+  const idx = PROBS.indexOf(p), prev = PROBS[idx - 1], next = PROBS[idx + 1];
+  const tabs = p.variants.length > 1 ? `<div class="vtabs">${p.variants.map((v, i) => `<button data-vi="${i}">${v.label}</button>`).join('')}</div>` : '';
+  $('#main').innerHTML = `
+  <article class="prob">
+    <div class="ph">
+      <div class="tag">${p.tag}</div>
+      <h2>${p.title}</h2>
+      <div class="orig">${T(p.orig)}</div>
+      <div class="given"><b>已知</b><div>${T(p.given)}</div><b>要求</b><div>${T(p.ask)}</div></div>
+    </div>
+    <div class="know">${p.know.map(k => `<div class="kc"><h5>${k[0]}</h5><p>${T(k[1])}</p></div>`).join('')}</div>
+    <div class="stage">
+      <div class="fig" id="fig">
+        ${tabs}
+        <div id="svgw"></div>
+        <div class="figbar">
+          <button class="btn" id="bPrev" title="上一步（←）">上一步</button>
+          <span class="stepno" id="stepno"></span>
+          <button class="btn pri" id="bNext" title="下一步（→）">下一步</button>
+          <button class="btn" id="bPlay">自动播放</button>
+          <span class="dots" id="dots"></span>
+        </div>
+        <div class="ctrl" id="ctrl"></div>
+        ${legendHTML()}
+      </div>
+      <ol class="steps" id="steps"></ol>
+    </div>
+    <section class="blk"><h3>作业本上这样写 <button class="btn" id="bCopy">复制文字</button></h3><div class="write" id="write"></div></section>
+    <div class="ans" id="ans"></div>
+    <section class="blk" id="pitw"><h3>容易错的地方</h3><ul class="pit" id="pit"></ul></section>
+    <nav class="pn">
+      ${prev ? `<a href="#${prev.id}"><small>上一题</small>${prev.nav} ${prev.short}</a>` : `<a href="#intro"><small>上一页</small>先看这页</a>`}
+      ${next ? `<a href="#${next.id}" style="text-align:right"><small>下一题</small>${next.nav} ${next.short}</a>` : `<a href="#sum" style="text-align:right"><small>最后</small>答案汇总</a>`}
+    </nav>
+  </article>`;
+  $('#bPrev').onclick = () => go(S.cur - 1);
+  $('#bNext').onclick = () => go(S.cur + 1);
+  $('#bPlay').onclick = togglePlay;
+  $('#bCopy').onclick = copyWrite;
+  document.querySelectorAll('.vtabs button').forEach(b => b.onclick = () => { stop(); S.vi = +b.dataset.vi; S.cur = 0; renderVariant(); });
+  renderVariant();
+}
+
+function V() { return S.p.variants[S.vi]; }
+function pick(k) { const v = V(); return v[k] != null ? v[k] : S.p[k]; }
+
+function renderVariant() {
+  const v = V();
+  document.querySelectorAll('.vtabs button').forEach(b => b.classList.toggle('on', +b.dataset.vi === S.vi));
+  S.params = {};
+  for (const k in (v.params || {})) S.params[k] = v.params[k].val;
+  drawSVG(true);
+  // 步骤
+  $('#steps').innerHTML = v.steps.map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
+  document.querySelectorAll('#steps li').forEach(li => li.onclick = () => { stop(); go(+li.dataset.i); });
+  $('#dots').innerHTML = v.steps.map((_, i) => `<i data-i="${i}" title="第 ${i} 步"></i>`).join('');
+  document.querySelectorAll('#dots i').forEach(d => d.onclick = () => { stop(); go(+d.dataset.i); });
+  // 滑块与工具
+  let c = '';
+  for (const k in (v.params || {})) {
+    const pm = v.params[k];
+    c += `<label><span>${pm.label}</span><span id="pv_${k}">${pm.fmt(pm.val)}</span></label><input type="range" id="pr_${k}" min="${pm.min}" max="${pm.max}" step="${pm.step}" value="${pm.val}">`;
+  }
+  if (v.readout) c += `<div class="readout" id="readout"></div>`;
+  if (v.tools) c += `<div style="display:flex;gap:8px">${v.tools.map((t, i) => `<button class="btn" data-tool="${i}">${t.label}</button>`).join('')}</div>`;
+  $('#ctrl').innerHTML = c;
+  for (const k in (v.params || {})) {
+    $('#pr_' + k).addEventListener('input', e => {
+      S.params[k] = +e.target.value;
+      $('#pv_' + k).textContent = v.params[k].fmt(S.params[k]);
+      drawSVG(true); updReadout();
+    });
+  }
+  if (v.tools) document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => v.tools[+b.dataset.tool].on($('#svgw'), b));
+  updReadout();
+  $('#write').innerHTML = (pick('write') || []).map(l => typeof l === 'string' ? `<div class="wl">${T(l)}</div>` : `<div class="wl zh">${T(l[0])}</div>`).join('');
+  $('#ans').innerHTML = `<b>答案</b>${T(pick('ans'))}`;
+  const pit = pick('pit') || [];
+  $('#pitw').style.display = pit.length ? '' : 'none';
+  $('#pit').innerHTML = pit.map(x => `<li>${T(x)}</li>`).join('');
+  go(S.cur, true);
+}
+
+function updReadout() { const v = V(); if (v.readout && $('#readout')) $('#readout').innerHTML = T(v.readout(S.params)); }
+
+function drawSVG(instant) {
+  const v = V();
+  const vb = v.vb || '0 0 640 460';
+  $('#svgw').innerHTML = `<svg class="dg instant" viewBox="${vb}" xmlns="http://www.w3.org/2000/svg">${v.svg(S.params)}</svg>`;
+  applyStep(true);
+}
+
+function applyStep(instant) {
+  const svg = $('#svgw svg');
+  if (!svg) return;
+  if (instant) svg.classList.add('instant');
+  const cur = S.cur;
+  svg.querySelectorAll('[data-s]').forEach(e => { const s = +e.dataset.s, u = e.dataset.u != null ? +e.dataset.u : 1e9; e.classList.toggle('on', cur >= s && cur < u); });
+  svg.querySelectorAll('[data-tk]').forEach(e => { e.style.transform = cur >= +e.dataset.tk ? e.dataset.tf : ''; });
+  svg.querySelectorAll('[data-dk]').forEach(e => { const a = +e.dataset.dk, b = e.dataset.du != null ? +e.dataset.du : 1e9; e.classList.toggle('dim', cur >= a && cur < b); });
+  svg.querySelectorAll('[data-hk]').forEach(e => { const L = String(e.dataset.hk).split(',').map(Number); e.classList.toggle('hot', L.includes(cur)); });
+  if (instant) { svg.getBoundingClientRect(); requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove('instant'))); }
+}
+
+function go(i, instant) {
+  const n = V().steps.length;
+  i = Math.max(0, Math.min(n - 1, i));
+  S.cur = i;
+  applyStep(instant);
+  document.querySelectorAll('#steps li').forEach(li => { const k = +li.dataset.i; li.classList.toggle('on', k === i); li.classList.toggle('later', k > i); });
+  document.querySelectorAll('#dots i').forEach(d => d.classList.toggle('on', +d.dataset.i <= i));
+  $('#stepno').textContent = `${i} / ${n - 1}`;
+  $('#bPrev').disabled = i === 0;
+  $('#bNext').disabled = i === n - 1;
+  if (!instant) {
+    const li = document.querySelector('#steps li.on');
+    if (li) {
+      const r = li.getBoundingClientRect(), figB = window.innerWidth <= 960 ? $('#fig').getBoundingClientRect().bottom : 0;
+      if (r.top < figB + 8 || r.bottom > window.innerHeight - 8) window.scrollBy({ top: r.top - figB - 16, behavior: 'smooth' });
+    }
+  }
+}
+
+function togglePlay() {
+  if (S.timer) { stop(); return; }
+  if (S.cur >= V().steps.length - 1) go(0);
+  $('#bPlay').textContent = '停止播放';
+  S.timer = setInterval(() => { if (S.cur >= V().steps.length - 1) { stop(); return; } go(S.cur + 1); }, 4200);
+}
+function stop() { if (S.timer) { clearInterval(S.timer); S.timer = null; } const b = $('#bPlay'); if (b) b.textContent = '自动播放'; }
+
+function copyWrite() {
+  const txt = (pick('write') || []).map(l => plainLine(typeof l === 'string' ? l : l[0])).join('\n');
+  const done = () => { const b = $('#bCopy'); b.textContent = '已复制'; setTimeout(() => b.textContent = '复制文字', 1500); };
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} ta.remove(); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
+}
+
+document.addEventListener('keydown', e => {
+  if (!S.p || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === 'ArrowRight') { stop(); go(S.cur + 1); }
+  if (e.key === 'ArrowLeft') { stop(); go(S.cur - 1); }
+});
+
+/* ================= P27 平面汇交力系 ================= */
+
+/* ---------- 第 6 题 ---------- */
+reg({
+  id: 'p27-6', nav: '27·6', short: '圆环三力合力',
+  tag: 'P27 · 第 6 题 · 平面汇交力系 · 图 1-2-9',
+  title: '墙上的圆环被三根绳拉，求合力',
+  orig: '固定在墙壁上的圆环受三条绳索的拉力作用，力 $F_1$ 沿水平方向，力 $F_3$ 沿铅直方向，力 $F_2$ 与水平线成 40° 角。三力的大小分别为 $F_1$ = 2000 N，$F_2$ = 2500 N，$F_3$ = 1500 N，求三力的合力。',
+  given: '$F_1$ = 2000 N，水平向左；$F_2$ = 2500 N，向左下，与水平线成 40°；$F_3$ = 1500 N，竖直向下',
+  ask: '合力 $F_R$ 的大小和方向',
+  know: [
+    ['汇交力系', '几个力的作用线交于同一点。这题三根绳都拴在圆环上，力的作用线都过圆环中心，可以看成从同一点发出的三支箭头。'],
+    ['投影（把斜的力拆开）', '一个斜着的力可以拆成水平、竖直两部分。和水平线夹角为 α 时：水平部分 = $Fcosα$，竖直部分 = $Fsinα$。'],
+    ['合力怎么求', '所有水平部分加起来得 $F_{Rx}$，竖直部分加起来得 $F_{Ry}$，再用勾股定理：$F_R=#sqrt{F_{Rx}^2+F_{Ry}^2}$。']
+  ],
+  sum: ['三力的合力', '$F_R$ ≈ 5.0 kN，指向左下方，与水平线成 38.4°'],
+  variants: [{
+    svg() {
+      const ox = 400, oy = 165;
+      const rope = (d, len) => {
+        const [a, b] = pol(ox, oy, 42, d), [c, e] = pol(ox, oy, len, d), [m, n] = pol(ox, oy, len * 0.58, d);
+        return D.ln(a, b, c, e, 'rope') + `<rect x="-14" y="-5" width="28" height="10" class="body" transform="translate(${f(m)} ${f(n)}) rotate(${-d})"/>`;
+      };
+      let s = '';
+      s += D.hatch(526, 88, 526, 242, -1);
+      s += D.rod([[444, oy], [526, oy]]);
+      let o = rope(180, 210) + rope(220, 210) + rope(270, 150);
+      s += D.g(o, { dk: 1 });
+      o = D.af(ox, oy, 36, 180, { g: 210, l: 'F_1', lp: [168, 152] });
+      o += D.af(ox, oy, 36, 220, { g: 210, l: 'F_2', lp: [200, 342] });
+      o += D.af(ox, oy, 36, 270, { g: 150, l: 'F_3', lp: [420, 346] });
+      s += D.g(o, { u: 1 });
+      s += `<g class="rod"><circle cx="${ox}" cy="${oy}" r="40" class="rodO"/><circle cx="${ox}" cy="${oy}" r="40" class="rodI"/></g>`;
+      s += D.arc(ox, oy, 62, 180, 220, '40°', { lo: 16 });
+      s += D.txt(414, 156, 'O');
+      // 第 1 步：三个力
+      s += D.af(ox, oy, 110, 180, { s: 1, l: 'F_1', lp: [280, 154], v: '2000 N', vp: [335, 155] });
+      s += D.af(ox, oy, 137.5, 220, { s: 1, dk: 5, l: 'F_2', lp: [294, 278], v: '2500 N', vp: [342, 276] });
+      s += D.af(ox, oy, 82.5, 270, { s: 1, dk: 5, l: 'F_3', lp: [420, 252], v: '1500 N', vp: [444, 232] });
+      // 第 2 步：坐标轴和 F2 的分量
+      s += D.g(D.arrow(110, oy, 505, oy, { c: 'ax', h: 10, w: 4, l: 'x', lp: [514, 159] }) + D.arrow(ox, 392, ox, 58, { c: 'ax', h: 10, w: 4, l: 'y', lp: [414, 66] }), { s: 2, u: 5 });
+      s += D.arrow(ox, oy, 294.7, oy, { c: 'g', dash: 1, s: 2, u: 3, l: 'F_{2x}', lp: [282, 187], la: 'end' });
+      s += D.arrow(294.7, oy, 294.7, 253.4, { c: 'g', dash: 1, s: 2, u: 3, l: 'F_{2y}', lp: [284, 214], la: 'end' });
+      // 第 3 步：分量求和
+      s += D.arrow(ox, oy, 184.7, oy, { c: 'r', dash: 1, s: 3, u: 5, l: 'F_{Rx}', lp: [238, 187] });
+      s += D.arrow(184.7, oy, 184.7, 335.9, { c: 'r', dash: 1, s: 3, u: 5, l: 'F_{Ry}', lp: [174, 262], la: 'end' });
+      // 第 4 步：合力
+      s += D.arrow(ox, oy, 184.7, 335.9, { c: 'r', s: 4, l: 'F_R', lp: [168, 356], v: '≈ 5000 N', vp: [238, 360] });
+      s += D.arc(ox, oy, 108, 180, 218.4, '38.4°', { c: 'r', s: 4, u: 5, lo: 22 });
+      // 第 5 步：力多边形
+      s += `<g data-s="5" data-tk="5" data-tf="translate(-110px,0px)" style="transition:opacity .4s,transform 1s cubic-bezier(.4,0,.2,1) .35s">${D.af(ox, oy, 137.5, 220, { l: 'F_2', lp: [282, 268] })}</g>`;
+      s += `<g data-s="5" data-tk="5" data-tf="translate(-215.3px,88.4px)" style="transition:opacity .4s,transform 1s cubic-bezier(.4,0,.2,1) 1.4s">${D.af(ox, oy, 82.5, 270, { l: 'F_3', lp: [386, 214], la: 'end' })}</g>`;
+      s += D.note(330, 430, '首尾相接，从 O 到最后一个箭头尖就是合力', { s: 5, c: 'r' });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '圆环用一根短杆固定在右边墙上。三根绳往外拉它：$F_1$ 朝左，$F_3$ 朝下，$F_2$ 朝左下，和水平线夹 40°。<br>绳子只能拉、不能推，所以拉力一定顺着绳子、背离圆环。'],
+      ['把三个力画到同一点', '三根绳的拉力作用线都经过圆环中心 O，可以都画成从 O 出发的箭头。几个力交于一点，就叫<b>平面汇交力系</b>。图里箭头的长短按力的大小比例画。'],
+      ['建坐标，把斜的力拆开', '取 x 轴水平向右、y 轴竖直向上，朝左、朝下的分量带负号。<br>$F_1$ 是水平的：$F_{1x}$ = −2000 N，$F_{1y}$ = 0。<br>$F_3$ 是竖直的：$F_{3x}$ = 0，$F_{3y}$ = −1500 N。<br>只有 $F_2$ 是斜的，拆成图里两段灰色虚线：$$F_{2x}=-F_2cos40°=-2500*0.766=-1915 #t{N}$$$$F_{2y}=-F_2sin40°=-2500*0.643=-1607 #t{N}$$<div class="tip"><b>记法</b>　角是和哪条轴的夹角，往这条轴上投影就用 cos，往另一条轴上投影就用 sin。</div>'],
+      ['同方向的加起来', '$$F_{Rx}=ΣF_x=-2000-1915+0=-3915 #t{N}$$$$F_{Ry}=ΣF_y=0-1607-1500=-3107 #t{N}$$两个都是负数：合力既朝左又朝下，指向左下方。图里两段绿色虚线就是它们。'],
+      ['勾股定理求大小，反正切求方向', '$$F_R=#sqrt{F_{Rx}^2+F_{Ry}^2}=#sqrt{3915^2+3107^2}≈4998 #t{N}≈5.0 #t{kN}$$$$tanα=#frac{|F_{Ry}|}{|F_{Rx}|}=#frac{3107}{3915}=0.794，α≈38.4°$$合力约 5.0 kN，指向左下方，和水平线（$F_1$ 的方向）夹 38.4°。'],
+      ['换个方法验算：力多边形', '把 $F_2$ 平移到 $F_1$ 的箭头尖上，再把 $F_3$ 平移到 $F_2$ 的箭头尖上，首尾相接。从起点 O 指向最后一个箭头尖的那条边就是合力，正好和上一步算出的绿色箭头重合。<br>这个画法叫<b>几何法</b>，可以用来检查计算有没有出错。']
+    ]
+  }],
+  write: [
+    ['解：以圆环为研究对象，三力汇交于 O 点。取 x 轴水平向右，y 轴铅直向上。'],
+    '$F_{Rx}=ΣF_x=-F_1-F_2cos40°=-2000-2500*0.766=-3915 #t{N}$',
+    '$F_{Ry}=ΣF_y=-F_2sin40°-F_3=-2500*0.643-1500=-3107 #t{N}$',
+    '$F_R=#sqrt{F_{Rx}^2+F_{Ry}^2}=#sqrt{3915^2+3107^2}≈4998 #t{N}≈5.0 #t{kN}$',
+    '$tanα=#frac{|F_{Ry}|}{|F_{Rx}|}=#frac{3107}{3915}=0.794，α≈38.4°$',
+    ['答：合力 $F_R$ ≈ 5.0 kN，指向左下方，与水平线成 38.4°（38°26′）。']
+  ],
+  ans: '$F_R$ ≈ 5.0 kN，指向左下方，与水平线（$F_1$ 方向）成 38.4°。',
+  pit: [
+    '$F_2$ 的 40° 是和水平线的夹角，水平分量用 cos，竖直分量用 sin。',
+    '朝左、朝下的分量要带负号；最后看 $F_{Rx}$、$F_{Ry}$ 的正负来判断合力指向哪边。'
+  ]
+});
+
+/* ---------- 第 7 题 ---------- */
+reg({
+  id: 'p27-7', nav: '27·7', short: '滑轮支架两杆受力',
+  tag: 'P27 · 第 7 题 · 平面汇交力系 · 图 1-2-10',
+  title: '绞车吊重物，求杆 AB 和杆 BC 受的力',
+  orig: '物体重 W = 20 kN，用绳子挂在支架的滑轮 B 上，绳子的另一端系在绞车 D 上。转动绞车，物体便能升起。A、B、C 处均为光滑铰链连接。钢丝绳、杆和滑轮的自重不计，并忽略摩擦和滑轮的大小。试求平衡时杆 AB 和杆 BC 所受的力。',
+  given: 'W = 20 kN；AB 水平，∠ABC = 30°；绳 BD 与竖直线成 30°',
+  ask: '杆 AB、杆 BC 受的力（大小，以及是拉还是压）',
+  know: [
+    ['二力杆', '两端用铰链连接、中间不受力、自重不计的杆。它受的力一定沿两个铰链的连线，要么拉，要么压。'],
+    ['滑轮两边绳力相等', '同一根绳绕过光滑滑轮，两边的拉力一样大。所以绞车那边的绳拉力也是 20 kN。'],
+    ['正负号说明方向', '先把杆力都设成拉力，算出负数就说明实际是压力，大小取绝对值。']
+  ],
+  sum: ['杆 AB、BC 受的力', '$F_{AB}$ ≈ 54.6 kN（拉），$F_{BC}$ ≈ 74.6 kN（压）'],
+  variants: [{
+    svg() {
+      const A = [96, 90], B = [430, 90], C = [96, 282.8], Dd = pol(430, 90, 262, 240);
+      let s = '';
+      s += D.hatch(90, 40, 90, 402, 1);
+      s += D.hatch(90, 402, 600, 402, 1);
+      let sc = '';
+      sc += D.ln(430, 104, 430, 232, 'rope');
+      sc += `<rect x="412" y="232" width="36" height="32" class="body"/>`;
+      sc += D.af(430, 264, 46, 270, { l: 'W', lp: [450, 310], v: '20 kN', vp: [466, 292], va: 'start' });
+      sc += D.ln(430, 90, Dd[0], Dd[1], 'rope');
+      sc += `<path d="M${f(Dd[0])},${f(Dd[1])} L${f(Dd[0] - 30)},402 L${f(Dd[0] + 30)},402 Z" class="body"/><circle cx="${f(Dd[0])}" cy="${f(Dd[1])}" r="14" class="body"/>` + D.pin(Dd[0], Dd[1], { r: 4 });
+      s += D.g(sc, { dk: 2 });
+      s += D.rod([A, B], { hk: '1', dk: 2 });
+      s += D.rod([C, B], { hk: '1', dk: 2 });
+      s += `<circle cx="430" cy="90" r="14" class="body"${at({ dk: 2 })}/>`;
+      s += D.pin(A[0], A[1]) + D.pin(C[0], C[1]) + D.pin(B[0], B[1]);
+      s += D.txt(112, 76, 'A') + D.txt(452, 76, 'B') + D.txt(114, 306, 'C') + D.txt(272, 322, 'D');
+      s += D.arc(430, 90, 62, 180, 210, '30°', { lo: 18 });
+      s += D.arc(430, 90, 46, 240, 270, '30°', { lo: 14 });
+      s += D.note(330, 446, 'AB、BC 两端铰接、中间不受力 → 二力杆', { s: 1, u: 2 });
+      // 第 2 步：B 点受力图
+      s += D.af(430, 90, 80, 270, { s: 2, l: 'F_{T1}', lp: [462, 166] });
+      s += D.af(430, 90, 80, 240, { s: 2, l: 'F_{T2}', lp: [372, 182] });
+      s += D.af(430, 90, 95, 180, { c: 'u', s: 2, u: 5, l: 'F_{AB}', lp: [330, 78] });
+      s += D.af(430, 90, 95, 210, { c: 'u', s: 2, u: 5, l: 'F_{BC}', lp: [326, 150] });
+      // 第 3 步：坐标
+      s += D.axes(430, 90, { len: 62, back: 26, s: 3 });
+      // 第 5 步：真实方向
+      s += D.af(430, 90, 95, 180, { c: 'r', s: 5, l: 'F_{AB}', lp: [316, 96], v: '54.6 kN 拉', vp: [384, 74] });
+      s += D.ai(430, 90, 95, 30, { c: 'r', s: 5, l: 'F_{BC}', lp: [318, 156], v: '74.6 kN 压', vp: [300, 176] });
+      s += D.note(330, 446, '绿色是真实方向：AB 被拉，BC 在往上顶 B', { s: 5, c: 'r' });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '重物挂在滑轮 B 上，绳子绕过滑轮通到绞车 D。AB 水平，BC 和 AB 夹 30°，绳 BD 和竖直方向夹 30°。题目说忽略滑轮大小和摩擦，所以所有力都可以看成作用在 B 点。'],
+      ['认出二力杆', 'AB、BC 两根杆只在两端用铰链连接，中间不受力，自重又不计，都是<b>二力杆</b>：受的力沿杆的方向，要么拉，要么压。<div class="tip"><b>小技巧</b>　不知道拉还是压时，先都假设成拉力，算出来是负数就说明其实是压力。</div>'],
+      ['取滑轮 B，画受力图', 'B 点一共受四个力：<br>重物那边的绳拉力 $F_{T1}$ = W = 20 kN，竖直向下；<br>绞车那边的绳拉力 $F_{T2}$ = 20 kN，沿 BD 方向；<br>$F_{AB}$ 沿 BA、$F_{BC}$ 沿 BC，都先设为拉力（蓝色，待求）。'],
+      ['先列只含一个未知数的方程', '取 x 轴水平向右、y 轴竖直向上。$F_{AB}$ 是水平的，在 y 方向没有分量，所以先列 y 方向：$$ΣF_y=0：-F_{BC}sin30°-F_{T1}-F_{T2}cos30°=0$$$$F_{BC}=-#frac{20+20*0.866}{0.5}=-74.6 #t{kN}$$<div class="tip"><b>角度</b>　$F_{T2}$ 和<b>竖直线</b>夹 30°，竖直分量是 $F_{T2}cos30°$；$F_{BC}$ 和<b>水平线</b>夹 30°，竖直分量是 $F_{BC}sin30°$。</div>'],
+      ['再列 x 方向', '$$ΣF_x=0：-F_{AB}-F_{BC}cos30°-F_{T2}sin30°=0$$$$F_{AB}=-(-74.6)*0.866-20*0.5=54.6 #t{kN}$$'],
+      ['看正负，判断拉压', '$F_{AB}$ = 54.6 kN 是正的，假设对了，AB 杆受<b>拉</b>。<br>$F_{BC}$ = −74.6 kN 是负的，真实方向和假设相反，BC 杆受<b>压</b>，大小 74.6 kN。图里绿色箭头是真实方向：BC 杆在往上顶 B 点。']
+    ]
+  }],
+  write: [
+    ['解：AB、BC 均为二力杆。取滑轮 B 为研究对象（滑轮尺寸不计），受力：$F_{T1}=F_{T2}=W=20 #t{kN}$，$F_{AB}$、$F_{BC}$ 均设为拉力。取 x 轴水平向右，y 轴铅直向上。'],
+    '$ΣF_y=0：-F_{BC}sin30°-F_{T1}-F_{T2}cos30°=0$',
+    '$F_{BC}=-#frac{F_{T1}+F_{T2}cos30°}{sin30°}=-#frac{20+17.32}{0.5}=-74.6 #t{kN}$',
+    '$ΣF_x=0：-F_{AB}-F_{BC}cos30°-F_{T2}sin30°=0$',
+    '$F_{AB}=-F_{BC}cos30°-F_{T2}sin30°=74.64*0.866-10=54.6 #t{kN}$',
+    ['答：AB 杆受拉力 54.6 kN；BC 杆受压力 74.6 kN（结果为负，表示实际受压）。']
+  ],
+  ans: 'AB 杆受拉，$F_{AB}$ = 20(1 + √3) ≈ 54.6 kN；BC 杆受压，$F_{BC}$ = 20(2 + √3) ≈ 74.6 kN。',
+  pit: [
+    '滑轮两边的绳拉力都是 20 kN，绞车那根绳的 $F_{T2}$ 很容易漏掉。',
+    '$F_{T2}$ 的 30° 是和竖直线的夹角，$F_{BC}$ 的 30° 是和水平线的夹角，投影时 sin、cos 正好相反。',
+    '算出负号不要改符号重算，直接写"负号表示实际方向与假设相反，杆受压"。'
+  ]
+});
+
+/* ---------- 第 11 题 ---------- */
+reg({
+  id: 'p27-11', nav: '27·11', short: '火箭空气动力',
+  tag: 'P27 · 第 11 题 · 平面汇交力系 · 图 1-2-14',
+  title: '火箭匀速飞行，求空气动力 F₂',
+  orig: '火箭沿与水平面成 β = 25° 角的方向做匀速直线运动。火箭的推力 <span class="chg">$F_1$ = 100 kN（老师改的，书上印 1000 kN）</span> 与运动方向成 θ = 5° 角。如火箭重 W = 200 kN，求空气动力 $F_2$ 及其与飞行方向之间的夹角 γ。',
+  given: '$F_1$ = 100 kN，θ = 5°；W = 200 kN；β = 25°',
+  ask: '空气动力 $F_2$ 的大小，和它与飞行方向的夹角 γ',
+  know: [
+    ['匀速直线运动也是平衡', '物体静止，或者做匀速直线运动，合力都为零，照样列 $ΣF_x=0$、$ΣF_y=0$。'],
+    ['坐标轴可以斜着取', '坐标轴不一定要水平、竖直。沿飞行方向取 x 轴，推力只偏 5°，重力只偏 25°，投影最简单。'],
+    ['三力平衡', '三个力平衡时，首尾相接能围成一个封闭的三角形。']
+  ],
+  sum: ['空气动力 $F_2$ 和夹角 γ', '$F_2$ ≈ 173 kN，γ ≈ 95°'],
+  variants: [{
+    svg() {
+      const ox = 300, oy = 250;
+      let ln = '';
+      ln += D.ln(ox, oy, 600, oy, 'dsh');
+      const [fa, fb] = pol(ox, oy, 190, 205), [fc, fd] = pol(ox, oy, 300, 25);
+      ln += D.ln(fa, fb, fc, fd, 'dsh');
+      ln += D.note(532, 126, '飞行方向');
+      ln += D.note(586, 270, '水平线');
+      ln += D.arc(ox, oy, 230, 0, 25, 'β = 25°', { lo: 36 });
+      ln += D.arc(ox, oy, 282, 25, 30, 'θ = 5°', { lo: 30, lp: [600, 104] });
+      let r = '';
+      r += D.ln(70, oy, 560, oy, 'dd');
+      r += `<path d="M150,${oy - 20} L410,${oy - 20} Q470,${oy - 16} 505,${oy} Q470,${oy + 16} 410,${oy + 20} L150,${oy + 20} Z" class="body"/>`;
+      r += `<path d="M160,${oy - 20} L118,${oy - 58} L168,${oy - 58} L205,${oy - 20} Z" class="body"/><path d="M160,${oy + 20} L118,${oy + 58} L168,${oy + 58} L205,${oy + 20} Z" class="body"/>`;
+      r += `<path d="M150,${oy - 12} L134,${oy - 16} L134,${oy + 16} L150,${oy + 12} Z" class="body"/>`;
+      r += `<rect x="222" y="${oy - 20}" width="10" height="40" class="inkf"/><rect x="330" y="${oy - 20}" width="5" height="40" class="inkf"/><rect x="341" y="${oy - 20}" width="5" height="40" class="inkf"/><rect x="420" y="${oy - 19}" width="9" height="38" class="inkf"/>`;
+      let s = D.g(ln, { dk: 6 });
+      s += `<g transform="rotate(-30 ${ox} ${oy})"${at({ dk: 2 })}>${r}</g>`;
+      s += D.pin(ox, oy, { r: 3.5 }) + D.txt(286, 268, 'O');
+      // 第 2 步：受力图
+      s += D.af(ox, oy, 75, 30, { s: 2, l: 'F_1', lp: [384, 212], v: '100 kN', vp: [404, 236] });
+      s += D.af(ox, oy, 150, 270, { s: 2, dk: 6, l: 'W', lp: [318, 404], v: '200 kN', vp: [312, 380], va: 'start' });
+      s += D.af(ox, oy, 130, 120, { c: 'u', s: 2, u: 4, l: 'F_2 ?', lp: [222, 128] });
+      // 第 3 步：转坐标轴
+      s += `<g data-s="3"${at({ dk: 6 })}><g data-tk="3" data-tf="rotate(-25deg)" style="transform-origin:${ox}px ${oy}px;transition:transform 1.3s cubic-bezier(.4,0,.2,1) .6s">${D.axes(ox, oy, { len: 175, back: 60 })}</g></g>`;
+      const [ny1, ny2] = pol(ox, oy, 125, 295);
+      s += D.ln(ox, oy, ny1, ny2, 'dsh', { s: 3, u: 6 });
+      s += D.note(ny1 + 8, ny2 + 14, '−y 方向', { s: 3, u: 6, a: 'start' });
+      s += D.arc(ox, oy, 74, 270, 295, '25°', { s: 3, u: 6, lo: 14 });
+      // 第 4 步：F2 的分量
+      s += D.af(ox, oy, 129.4, 115, { c: 'g', dash: 1, s: 4, u: 6, l: 'F_{2y}', lp: [254, 200], la: 'end' });
+      s += D.af(245.3, 132.7, 11.3, 205, { c: 'g', s: 4, u: 6, h: 7, w: 3 });
+      s += D.note(112, 170, 'x 方向只剩 −15 kN', { s: 4, u: 5 });
+      // 第 5 步：结果
+      s += D.af(ox, oy, 130, 120, { c: 'r', s: 5, dk: 6, l: 'F_2', lp: [222, 128], v: '≈ 173 kN', vp: [198, 150] });
+      s += D.arc(ox, oy, 48, 25, 120, 'γ = 95°', { c: 'r', s: 5, u: 6, lo: 24 });
+      // 第 6 步：力三角形
+      s += `<g data-s="6" data-tk="6" data-tf="translate(65px,-37.5px)" style="transition:opacity .4s,transform 1s cubic-bezier(.4,0,.2,1) .35s">${D.af(ox, oy, 150, 270, { l: 'W', lp: [320, 330] })}</g>`;
+      s += `<g data-s="6" data-tk="6" data-tf="translate(65px,112.5px)" style="transition:opacity .4s,transform 1s cubic-bezier(.4,0,.2,1) 1.4s">${D.af(ox, oy, 130, 120, { c: 'r', l: 'F_2', lp: [252, 206] })}</g>`;
+      s += D.note(320, 440, '三个力首尾相接，围成封闭三角形 → 合力为零', { s: 6, c: 'r' });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '火箭沿着和水平面成 β = 25° 的方向飞，箭体轴线比飞行方向再抬高 θ = 5°。它受三个力：发动机推力 $F_1$（沿箭体轴线）、重力 W（竖直向下）、空气动力 $F_2$（大小、方向都不知道）。<div class="tip"><b>注意</b>　老师把 $F_1$ 改成了 100 kN，书上印的 1000 kN 不用。</div>'],
+      ['匀速直线运动 = 平衡', '物体静止，或者做匀速直线运动，合力都等于零，都叫<b>平衡</b>。火箭虽然在飞，照样可以列平衡方程 $ΣF_x=0$、$ΣF_y=0$。'],
+      ['画受力图', '三个力都画到火箭上一点 O。推力沿箭体轴线，可以沿作用线滑到 O 点。$F_2$ 是要求的，大小方向都不知道，先随便画一个方向（蓝色）。'],
+      ['坐标轴转个角度更好算', '把 x 轴转到飞行方向上，y 轴垂直于飞行方向（看图里坐标轴转动）。这样：<br>$F_1$ 和 x 轴只差 θ = 5°；<br>W 竖直向下，和 −y 方向夹 β = 25°。$$F_{1x}=F_1cos5°=99.62，F_{1y}=F_1sin5°=8.72$$$$W_x=-Wsin25°=-84.52，W_y=-Wcos25°=-181.26$$（单位都是 kN）<div class="tip"><b>为什么 W 用 sin</b>　W 和 y 轴夹 25°，往 y 轴投影用 cos，往 x 轴投影就用 sin。</div>'],
+      ['列平衡方程，求 F₂ 的两个分量', '$$ΣF_x=0：99.62-84.52+F_{2x}=0 ⇒ F_{2x}=-15.10 #t{kN}$$$$ΣF_y=0：8.72-181.26+F_{2y}=0 ⇒ F_{2y}=172.55 #t{kN}$$$F_{2x}$ 是负的、很小；$F_{2y}$ 是正的、很大。所以 $F_2$ 差不多垂直于飞行方向朝上，稍微往后偏。'],
+      ['合成 F₂，求夹角 γ', '$$F_2=#sqrt{15.10^2+172.55^2}≈173 #t{kN}$$$F_2$ 越过了 y 轴、往后偏了一点，它和 −x 方向的夹角 φ：$$tanφ=#frac{172.55}{15.10}=11.43，φ≈85.0°$$所以 $F_2$ 和飞行方向的夹角 γ = 180° − 85.0° = 95°。'],
+      ['画力三角形检查', '把 $F_1$、W、$F_2$ 首尾相接，正好围成一个封闭三角形。三角形封闭说明合力为零，火箭确实平衡，结果没算错。']
+    ]
+  }],
+  write: [
+    ['解：火箭做匀速直线运动，处于平衡。受推力 $F_1$、重力 W、空气动力 $F_2$，三力汇交。取 x 轴沿飞行方向，y 轴垂直于飞行方向。'],
+    '$ΣF_x=0：F_1cosθ-Wsinβ+F_{2x}=0$',
+    '$F_{2x}=Wsinβ-F_1cosθ=200sin25°-100cos5°=84.52-99.62=-15.10 #t{kN}$',
+    '$ΣF_y=0：F_1sinθ-Wcosβ+F_{2y}=0$',
+    '$F_{2y}=Wcosβ-F_1sinθ=200cos25°-100sin5°=181.26-8.72=172.55 #t{kN}$',
+    '$F_2=#sqrt{F_{2x}^2+F_{2y}^2}=#sqrt{15.10^2+172.55^2}≈173 #t{kN}$',
+    '$tan(180°-γ)=#frac{172.55}{15.10}=11.43，180°-γ≈85.0°，γ≈95°$',
+    ['答：空气动力 $F_2$ ≈ 173 kN，与飞行方向的夹角 γ ≈ 95°。']
+  ],
+  ans: '$F_2$ ≈ 173 kN，与飞行方向的夹角 γ ≈ 95°（按 $F_1$ = 100 kN 计算）。',
+  pit: [
+    '$F_1$ 按老师要求取 100 kN。',
+    'β 是飞行方向和水平面的夹角，θ 是推力和飞行方向的夹角，两个角别混用。',
+    '坐标轴沿飞行方向取，W 的分量用 β：$W_x=-Wsinβ$，$W_y=-Wcosβ$。'
+  ]
+});
+
+/* ---------- 第 12 题 ---------- */
+reg({
+  id: 'p27-12', nav: '27·12', short: '拔桩机',
+  tag: 'P27 · 第 12 题 · 平面汇交力系 · 图 1-2-15',
+  title: '拔桩机：800 N 怎么变成 80 kN',
+  orig: '在桩的点 A 上系一绳，将绳的另一端固定在点 C，在绳的另一点 B 系另一绳 BE，将它的另一端固定在点 E。然后在绳的点 D 用力向下拉，并使绳的 BD 段水平，AB 段铅直，DE 段与水平线、CB 段与铅直线间成等角 θ = 0.1 rad（当 θ 很小时，tanθ ≈ θ）。如向下的拉力 F = 800 N，求绳 AB 作用于桩上的拉力。',
+  given: 'F = 800 N，θ = 0.1 rad；BD 水平，AB 铅直',
+  ask: '绳 AB 拉桩的力',
+  know: [
+    ['绳子只能受拉', '绳的拉力沿绳子方向，背离所研究的点。'],
+    ['先挑未知数少的点', '平面汇交力系只有两个方程，所以先找只有两个未知力的点下手。'],
+    ['小角近似', 'θ 很小时，tanθ ≈ θ（θ 用弧度）。0.1 rad 约等于 5.7°。']
+  ],
+  sum: ['绳 AB 拉桩的力', '$F_{AB}=F/θ^2$ = 80 kN'],
+  variants: [{
+    params: { th: { min: 0.05, max: 0.3, step: 0.01, val: 0.1, label: '角度 θ（拖动试试）', fmt: v => `${v.toFixed(2)} rad（${(v / RAD).toFixed(1)}°）` } },
+    readout: p => { const t = Math.tan(p.th), a = 800 / t, b = 800 / t / t; return `$F_{DB}=F/tanθ$ = <b>${(a / 1000).toFixed(2)} kN</b>，$F_{AB}=F/tan^2θ$ = <b>${(b / 1000).toFixed(1)} kN</b>，放大约 <b>${Math.round(b / 800)}</b> 倍。`; },
+    svg(p) {
+      const t = p.th, deg = t / RAD, tn = Math.tan(t);
+      const Bx = 470, By = 220, Dx = 250, Dy = 220, Ax = 470, Ay = 318;
+      const Ex = 44, Ey = Dy - (Dx - Ex) * tn, Cy = 58, Cx = Bx + (By - Cy) * tn;
+      let s = '';
+      s += D.hatch(16, 380, 624, 380, 1);
+      s += D.pl([[44, 380], [44, 50], [600, 50], [600, 380]], 'frm');
+      s += D.ln(Cx, 50, Cx, Cy, 'ln');
+      s += `<path d="M458,${Ay} L482,${Ay} L482,428 L470,448 L458,428 Z" class="body"/>`;
+      let rp = D.ln(Ex, Ey, Dx, Dy, 'rope') + D.ln(Dx, Dy, Bx, By, 'rope') + D.ln(Bx, By, Cx, Cy, 'rope') + D.ln(Bx, By, Ax, Ay, 'rope');
+      s += D.g(rp, { dk: 2 });
+      s += D.pin(Ex, Ey, { r: 4 }) + D.pin(Cx, Cy, { r: 4 }) + D.pin(Ax, Ay, { r: 4 });
+      s += `<circle cx="${Dx}" cy="${Dy}" r="3.5" class="inkf"/><circle cx="${Bx}" cy="${By}" r="3.5" class="inkf"/>`;
+      s += D.af(Dx, Dy, 72, 270, { l: 'F', lp: [266, 300], v: '800 N', vp: [262, 280], va: 'start' });
+      s += D.ln(Dx, Dy, Dx - 120, Dy, 'dsh');
+      s += D.arc(Dx, Dy, 52, 180 - deg, 180, 'θ', { lo: 14 });
+      s += D.ln(Cx, Cy, Cx, Cy + 125, 'dsh');
+      s += D.arc(Cx, Cy, 82, 270 - deg, 270, 'θ', { lo: 14 });
+      s += D.txt(490, 334, 'A') + D.txt(490, 212, 'B') + D.txt(Cx + 18, Cy + 20, 'C') + D.txt(240, 208, 'D') + D.txt(64, Ey - 10, 'E');
+      s += `<circle cx="${Dx}" cy="${Dy}" r="15" class="focus"${at({ s: 1, u: 2 })}/><circle cx="${Bx}" cy="${By}" r="15" class="focus"${at({ s: 1, u: 2 })}/>`;
+      // 第 2 步：结点 D
+      s += D.af(Dx, Dy, 92, 180 - deg, { c: 'u', s: 2, u: 4, l: 'F_{DE}', lp: [150, 196] });
+      s += D.af(Dx, Dy, 92, 0, { c: 'u', s: 2, u: 4, l: 'F_{DB}', lp: [330, 208] });
+      // 第 3 步：结点 B
+      s += D.af(Bx, By, 92, 180, { s: 3, l: 'F_{BD}', lp: [396, 208], v: '≈ 8 kN', vp: [410, 240] });
+      s += D.af(Bx, By, 92, 90 - deg, { c: 'u', s: 3, l: 'F_{BC}', lp: [506, 146] });
+      s += D.af(Bx, By, 72, 270, { c: 'u', s: 3, u: 4, l: 'F_{BA}', lp: [494, 290] });
+      // 第 4 步：拉桩的力
+      s += D.af(Ax, Ay, 80, 90, { c: 'r', s: 4, l: 'F_{AB}', lp: [500, 258], v: '≈ 80 kN', vp: [488, 280], va: 'start' });
+      s += D.note(250, 352, '800 N  →  8 kN  →  80 kN', { s: 4, c: 'r' });
+      return s;
+    },
+    steps: [
+      ['先看懂装置', '绳的一端拴在桩顶 A，另一端固定在架子顶上的 C；绳上 B 点再拴一根绳通到左边柱子上的 E。人在 D 点往下拉。BD 水平，AB 竖直；DE 和水平线、CB 和竖直线都夹一个很小的角 θ = 0.1 rad（约 5.7°）。<div class="tip"><b>拖动图下面的滑块</b>　可以改 θ，看拉桩的力怎么变。</div>'],
+      ['找两个绳结', '整个装置有两个绳结：D 和 B。D 处只有两根绳的力未知，先算 D；算出 BD 的拉力后，B 处也只剩两个未知力，再算 B。'],
+      ['结点 D', '受力：向下的拉力 F = 800 N，绳 DE 的拉力 $F_{DE}$，绳 DB 的拉力 $F_{DB}$。$$ΣF_y=0：F_{DE}sinθ-F=0 ⇒ F_{DE}=#frac{F}{sinθ}$$$$ΣF_x=0：F_{DB}-F_{DE}cosθ=0 ⇒ F_{DB}=#frac{F}{tanθ}$$θ 很小时 tanθ ≈ θ：$$F_{DB}≈#frac{800}{0.1}=8000 #t{N}=8 #t{kN}$$'],
+      ['结点 B', '受力：绳 BD 的拉力 $F_{BD}$ = 8 kN（刚算出来，变成已知），绳 BC 的拉力 $F_{BC}$，绳 BA 的拉力 $F_{BA}$。$$ΣF_x=0：F_{BC}sinθ-F_{BD}=0$$$$ΣF_y=0：F_{BC}cosθ-F_{BA}=0 ⇒ F_{BA}=#frac{F_{BD}}{tanθ}$$$$F_{BA}≈#frac{8000}{0.1}=80000 #t{N}=80 #t{kN}$$'],
+      ['结果：力放大了 100 倍', '绳 AB 拉桩的力：$$F_{AB}=#frac{F}{tan^2θ}≈#frac{F}{θ^2}=#frac{800}{0.01}=80 #t{kN}$$每经过一个绳结，力放大 1/θ = 10 倍，两次就是 100 倍。人只用 800 N，就能用 80 kN 的力拔桩。']
+    ]
+  }],
+  write: [
+    ['解：(1) 取结点 D 为研究对象，受 F、$F_{DE}$、$F_{DB}$ 作用。'],
+    '$ΣF_y=0：F_{DE}sinθ-F=0$',
+    '$ΣF_x=0：F_{DB}-F_{DE}cosθ=0 ⇒ F_{DB}=#frac{F}{tanθ}≈#frac{F}{θ}=#frac{800}{0.1}=8000 #t{N}$',
+    ['(2) 取结点 B 为研究对象，受 $F_{BD}$、$F_{BC}$、$F_{BA}$ 作用，$F_{BD}=F_{DB}$。'],
+    '$ΣF_x=0：F_{BC}sinθ-F_{BD}=0$',
+    '$ΣF_y=0：F_{BC}cosθ-F_{BA}=0 ⇒ F_{BA}=#frac{F_{BD}}{tanθ}≈#frac{8000}{0.1}=80000 #t{N}$',
+    ['答：绳 AB 作用于桩上的拉力 $F_{AB}=F/θ^2$ = 80 kN，方向铅直向上。']
+  ],
+  ans: '绳 AB 拉桩的力 $F_{AB}≈F/θ^2$ = 80 kN，竖直向上。',
+  pit: [
+    '要先算 D 再算 B：B 处一开始有三个未知力，直接算解不出来。',
+    '两个 θ 的位置不同：DE 和水平线夹 θ，CB 和竖直线夹 θ。',
+    '题目让用 tanθ ≈ θ，所以写 80 kN；用精确值算是 79.5 kN。'
+  ]
+});
+
+/* ---------- 第 13 题 ---------- */
+reg({
+  id: 'p27-13', nav: '27·13', short: '液压夹紧机构',
+  tag: 'P27 · 第 13 题 · 平面汇交力系 · 图 1-2-16',
+  title: '液压夹紧机构，求工件受的压紧力',
+  orig: '液压夹紧机构中，D 为固定铰链，B、C、E 为活动铰链。已知力 F，机构平衡时角度如图所示，各构件自重不计，各接触处光滑。求此时工件 H 所受的压紧力。',
+  given: '活塞推力 F；BC 与水平线成 θ，CD、CE 与竖直线各成 θ',
+  ask: '工件 H 受到的压紧力 $F_H$（用 F 和 θ 表示）',
+  know: [
+    ['二力杆', 'BC、CD、CE 都只在两端铰接、不计自重，力沿杆的方向。'],
+    ['坐标轴垂直于不要的力', '把某个坐标轴取得和一个未知力垂直，这个力在该轴上的投影是零，方程里就少一个未知数。'],
+    ['这个机构为什么能"增力"', '杆越接近水平（θ 越小），同样的推力 F 产生的压紧力越大。']
+  ],
+  sum: ['工件 H 的压紧力', '$F_H=#frac{F}{2sin^2θ}$'],
+  variants: [{
+    params: { th: { min: 12, max: 40, step: 1, val: 25, label: '角度 θ（拖动试试）', fmt: v => v + '°' } },
+    readout: p => { const k = 1 / (2 * Math.sin(p.th * RAD) ** 2); return `θ = ${p.th}° 时，$F_H=#frac{F}{2sin^2θ}$ = <b>${k.toFixed(2)} F</b>，即压紧力是推力的 ${k.toFixed(1)} 倍。`; },
+    svg(p) {
+      const t = p.th, st = Math.sin(t * RAD), ct = Math.cos(t * RAD);
+      const Bx = 120, By = 160, Cx = Bx + 220 * ct, Cy = By + 220 * st, Dx = Cx + 150 * st, Dy = Cy - 150 * ct, Ex = Cx + 120 * st, Ey = Cy + 120 * ct;
+      let s = '';
+      // 油缸
+      s += D.ln(94, 18, 94, 104, 'frm') + D.ln(146, 18, 146, 104, 'frm') + D.ln(94, 104, 113, 104, 'frm') + D.ln(127, 104, 146, 104, 'frm');
+      s += D.hatch(58, 104, 92, 104, 1) + D.hatch(148, 104, 182, 104, 1);
+      s += `<rect x="97" y="66" width="46" height="12" class="body"/>`;
+      s += D.rod([[120, 78], [Bx, By]]);
+      s += D.arrow(120, 22, 120, 63, { l: 'F', lp: [108, 46], la: 'end' });
+      s += D.txt(166, 76, 'A');
+      // 三根杆
+      s += D.rod([[Bx, By], [Cx, Cy]], { hk: '1', dk: 2 });
+      s += D.rod([[Cx, Cy], [Dx, Dy]], { hk: '1', dk: 2 });
+      s += D.rod([[Cx, Cy], [Ex, Ey]], { hk: '1', dk: 2 });
+      s += D.fixed(Dx, Dy, 180);
+      // 压板、导轨、工件
+      s += D.hatch(Ex - 40, Ey - 24, Ex - 40, Ey + 36, 1) + D.hatch(Ex + 40, Ey - 24, Ex + 40, Ey + 36, -1);
+      s += `<rect x="${f(Ex - 32)}" y="${f(Ey + 5)}" width="64" height="12" class="body"/><rect x="${f(Ex - 34)}" y="${f(Ey + 17)}" width="68" height="19" class="body"/>`;
+      s += D.hatch(Ex - 62, Ey + 36, Ex + 62, Ey + 36, 1);
+      s += D.txt(Ex, Ey + 32, 'H');
+      s += D.pin(Bx, By) + D.pin(Cx, Cy) + D.pin(Ex, Ey);
+      // 参考线与角
+      s += D.ln(Cx, Cy, Cx - 120, Cy, 'dsh') + D.ln(Cx, Cy - 105, Cx, Cy + 105, 'dsh');
+      s += D.arc(Cx, Cy, 64, 180 - t, 180, 'θ', { lo: 13 });
+      s += D.arc(Cx, Cy, 46, 90 - t, 90, 'θ', { lo: 12 });
+      s += D.arc(Cx, Cy, 46, 270, 270 + t, 'θ', { lo: 12 });
+      s += D.txt(Bx - 16, By + 22, 'B') + D.txt(Cx - 14, Cy + 24, 'C') + D.txt(Dx + 24, Dy + 8, 'D') + D.txt(Ex + 18, Ey - 6, 'E');
+      // 第 2 步：铰 B
+      s += D.af(Bx, By, 58, 270, { s: 2, u: 3, g: 6, l: 'F', lp: [104, 222], la: 'end' });
+      s += D.af(Bx, By, 80, 180 - t, { c: 'u', s: 2, u: 3, g: 6, l: 'F_{BC}', lp: [...pol(Bx, By, 96, 180 - t)].map((v, i) => i ? v - 4 : v + 4) });
+      s += D.af(Bx, By, 60, 0, { c: 'u', s: 2, u: 3, g: 6, l: 'F_{NB}', lp: [166, 150] });
+      // 第 3 步：铰 C
+      s += D.ai(Cx, Cy, 82, -t, { s: 3, u: 4, l: 'F_{CB}', lp: (() => { const q = pol(Cx, Cy, 92, 180 - t); return [q[0] - 6, q[1] - 12]; })() });
+      s += D.ai(Cx, Cy, 82, 270 - t, { c: 'u', s: 3, u: 4, l: 'F_{CD}', lp: (() => { const q = pol(Cx, Cy, 94, 90 - t); return [q[0] + 30, q[1] + 8]; })() });
+      s += D.ai(Cx, Cy, 70, 90 + t, { c: 'u', s: 3, u: 4, l: 'F_{CE}', lp: (() => { const q = pol(Cx, Cy, 84, 270 + t); return [q[0] - 34, q[1] + 2]; })() });
+      const [x1a, x1b] = pol(Cx, Cy, 150, 180 - t), [x2a, x2b] = pol(Cx, Cy, 150, -t), [xla, xlb] = pol(Cx, Cy, 166, -t);
+      s += D.ln(x1a, x1b, x2a, x2b, 'dsh h', { s: 3, u: 4 });
+      s += D.txt(xla, xlb + 6, 'x′', 'pt', { s: 3, u: 4 });
+      s += D.rt(Cx, Cy, -t, 90 - t, 12, { s: 3, u: 4 });
+      // 第 4 步：压板 E
+      s += D.ai(Ex, Ey, 70, 270 + t, { s: 4, l: 'F_{CE}', lp: (() => { const q = pol(Ex, Ey, 44, 90 + t); return [q[0] + 30, q[1]]; })() });
+      s += D.ln(Ex + 34, Ey + 17, Ex + 64, Ey + 17, 'dsh r', { s: 4 });
+      s += D.ai(Ex + 64, Ey + 17, 48, 270, { c: 'r', s: 4, g: 0, l: 'F_H', lp: [Ex + 88, Ey - 6] });
+      return s;
+    },
+    steps: [
+      ['先看懂机构', '油压推活塞 A，推力 F 经活塞杆传到铰 B。杆 BC 把力传给铰 C，C 又被杆 CD 拉住（D 是固定铰），最后杆 CE 推压板，把工件 H 压紧。<br>角度关系：BC 和水平线夹 θ，CD、CE 都和竖直线夹 θ。<div class="tip"><b>拖动图下面的滑块</b>　改变 θ，看压紧力怎么变。</div>'],
+      ['认出三根二力杆', 'BC、CD、CE 都是两端铰接、中间不受力、不计自重的杆，都是<b>二力杆</b>，力沿杆的方向。所以只要研究两个铰：先研究 B，再研究 C。'],
+      ['铰 B：求 BC 杆的力', 'B 受三个力：活塞杆传来的 F（向下）、BC 杆的力 $F_{BC}$（沿 BC）、缸体给活塞杆的水平力 $F_{NB}$。竖直方向只有 F 和 $F_{BC}$ 有分量：$$ΣF_y=0：F_{BC}sinθ-F=0 ⇒ F_{BC}=#frac{F}{sinθ}$$'],
+      ['铰 C：坐标轴沿 BC 方向', 'C 受三个力：$F_{CB}$（大小等于 $F_{BC}$）、$F_{CD}$、$F_{CE}$。<br>BC 和 CD 正好互相垂直（图中直角符号）。把 x′ 轴取在 BC 方向上，$F_{CD}$ 在 x′ 上的投影为零，一个方程就求出 $F_{CE}$：$$ΣF_{x′}=0：F_{CB}-F_{CE}sin2θ=0$$$$F_{CE}=#frac{F_{CB}}{sin2θ}=#frac{F}{sinθ·sin2θ}$$<div class="tip"><b>为什么是 sin2θ</b>　CE 和竖直线夹 θ，BC 和水平线夹 θ，所以 CE 和 BC 的夹角是 90° − 2θ，投影 = $F_{CE}cos(90°-2θ)=F_{CE}sin2θ$。</div>'],
+      ['压板 E：竖直分量就是压紧力', 'CE 杆斜着推压板。压板被两侧导轨夹住，只能上下动，水平分量由导轨承担，竖直分量压在工件上：$$F_H=F_{CE}cosθ=#frac{Fcosθ}{sinθ·2sinθcosθ}=#frac{F}{2sin^2θ}$$θ 越小，压紧力越大。θ = 10° 时，压紧力约是 F 的 16.6 倍。']
+    ]
+  }],
+  write: [
+    ['解：BC、CD、CE 均为二力杆。'],
+    ['(1) 取铰 B 为研究对象：'],
+    '$ΣF_y=0：F_{BC}sinθ-F=0 ⇒ F_{BC}=#frac{F}{sinθ}$',
+    ['(2) 取铰 C 为研究对象，x′ 轴沿 BC 方向（与 CD 垂直）：'],
+    '$ΣF_{x′}=0：F_{CB}-F_{CE}cos(90°-2θ)=0 ⇒ F_{CE}=#frac{F_{CB}}{sin2θ}=#frac{F}{sinθsin2θ}$',
+    ['(3) 取压板 E 为研究对象，工件所受压紧力为 $F_{CE}$ 的铅直分量：'],
+    '$F_H=F_{CE}cosθ=#frac{Fcosθ}{2sin^2θcosθ}=#frac{F}{2sin^2θ}$',
+    ['答：工件 H 所受压紧力 $F_H=#frac{F}{2sin^2θ}$，方向铅直向下。']
+  ],
+  ans: '$F_H=#frac{F}{2sin^2θ}$，铅直向下压在工件上。',
+  pit: [
+    '研究铰 C 时如果用水平、竖直坐标轴，要解二元一次方程组；把轴取在 BC 方向，CD 的力直接消掉。',
+    '工件受的是 $F_{CE}$ 的竖直分量 $F_{CE}cosθ$，不是 $F_{CE}$ 本身。'
+  ]
+});
+
+/* ---------- 第 14 题 ---------- */
+reg({
+  id: 'p27-14', nav: '27·14', short: '四杆机构 F₁ 与 F₂',
+  tag: 'P27 · 第 14 题 · 平面汇交力系 · 图 1-2-17',
+  title: '铰链四杆机构平衡，求 F₁ 与 F₂ 的关系',
+  orig: '铰链四杆机构 CABD 的 CD 边固定，在铰链 A、B 处分别有力 $F_1$、$F_2$ 作用。该铰链机构在图示位置平衡，杆重略去不计。求力 $F_1$ 与 $F_2$ 的关系。',
+  given: '$F_1$ 与 AB 夹 45°、与 AC 夹 60°；$F_2$ 与 BA、BD 各夹 30°；AC 竖直',
+  ask: '$F_1$ 与 $F_2$ 的比值',
+  know: [
+    ['两个结点接力', 'A、B 两个铰各受三个力。A 处算出 AB 杆的力，再拿到 B 处用，AB 杆就是两个结点之间的"接力棒"。'],
+    ['轴垂直于不想要的力', '在 A 点让 x 轴垂直于 AC，在 B 点让 x′ 轴垂直于 BD，每个点只用一个方程。']
+  ],
+  sum: ['$F_1$ 与 $F_2$ 的关系', '$F_1/F_2=cos15°/1.5≈0.644$'],
+  variants: [{
+    svg() {
+      const C = [150, 400], A = [150, 150], B = [468.8, 64.6], Dd = [378.9, 400];
+      let s = '';
+      s += D.rod([C, A], { hk: '1', dk: 2 }) + D.rod([A, B], { hk: '1', dk: 2 }) + D.rod([B, Dd], { hk: '1', dk: 2 });
+      s += D.fixed(C[0], C[1]) + D.fixed(Dd[0], Dd[1]) + D.pin(A[0], A[1]) + D.pin(B[0], B[1]);
+      s += D.af(A[0], A[1], 92, -30, { g: 6, l: 'F_1', lp: [246, 214] });
+      s += D.af(B[0], B[1], 92, 225, { g: 6, l: 'F_2', lp: [388, 152] });
+      s += D.arc(A[0], A[1], 46, -30, 15, '45°', { lo: 16, dk: 2, du: 3 });
+      s += D.arc(A[0], A[1], 34, -90, -30, '60°', { lo: 15, dk: 2, du: 3 });
+      s += D.arc(B[0], B[1], 56, 195, 225, '30°', { lo: 16 });
+      s += D.arc(B[0], B[1], 40, 225, 255, '30°', { lo: 14 });
+      s += D.txt(130, 142, 'A') + D.txt(490, 58, 'B') + D.txt(126, 404, 'C') + D.txt(404, 404, 'D');
+      // 第 2 步：铰 A
+      s += D.af(A[0], A[1], 85, 15, { c: 'u', s: 2, g: 6, l: 'F_{AB}', lp: [256, 116] });
+      s += D.af(A[0], A[1], 80, 270, { c: 'u', s: 2, g: 6, l: 'F_{AC}', lp: [126, 244], la: 'end' });
+      s += D.ln(70, 150, 310, 150, 'dsh h', { s: 2 });
+      s += D.txt(320, 155, 'x', 'pt', { s: 2 });
+      s += D.arc(A[0], A[1], 70, -30, 0, '30°', { s: 2, u: 3, c: 'r', lo: 16 });
+      s += D.arc(A[0], A[1], 100, 0, 15, '15°', { s: 2, u: 3, c: 'r', lo: 14 });
+      // 第 3 步：铰 B
+      s += D.af(B[0], B[1], 85, 195, { c: 'u', s: 3, g: 6, l: 'F_{BA}', lp: [372, 80] });
+      s += D.af(B[0], B[1], 80, 255, { c: 'u', s: 3, g: 6, l: 'F_{BD}', lp: [470, 152], la: 'start' });
+      const [p1a, p1b] = pol(B[0], B[1], 70, 165), [p2a, p2b] = pol(B[0], B[1], 112, 345), [pla, plb] = pol(B[0], B[1], 126, 345);
+      s += D.ln(p1a, p1b, p2a, p2b, 'dsh h', { s: 3 });
+      s += D.txt(pla, plb + 6, 'x′', 'pt', { s: 3 });
+      s += D.rt(B[0], B[1], 255, 345, 12, { s: 3 });
+      s += D.note(330, 446, 'F₁ : F₂ = cos15° : 1.5 ≈ 0.644', { s: 4, c: 'r' });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '四根杆围成四边形 CABD，底边 CD 固定，C、D 是固定铰支座。铰 A 上作用 $F_1$，铰 B 上作用 $F_2$，机构在图示位置不动。要找 $F_1$ 和 $F_2$ 的关系。<br>图上的角：$F_1$ 和 AB 夹 45°、和 AC 夹 60°；$F_2$ 和 BA、BD 都夹 30°。'],
+      ['三根杆都是二力杆', 'AC、AB、BD 都是两端铰接、不计自重的杆，力都沿杆的方向。A、B 两个铰各受三个力。思路：从铰 A 求出 AB 杆的力，再拿到铰 B 去用。'],
+      ['铰 A：x 轴垂直于 AC', 'A 受 $F_1$、$F_{AB}$、$F_{AC}$（杆力先设为拉力）。$F_{AC}$ 是竖直的，取 x 轴水平，它就不出现在方程里。<br>$F_1$ 和 AC 夹 60°，所以和水平线夹 30°；AB 和 AC 夹 45° + 60° = 105°，所以 AB 和水平线夹 15°。$$ΣF_x=0：F_1cos30°+F_{AB}cos15°=0$$$$F_{AB}=-#frac{cos30°}{cos15°}F_1=-0.897F_1$$负号说明 AB 杆实际受压。'],
+      ['铰 B：x′ 轴垂直于 BD', 'B 受 $F_2$、$F_{BA}$、$F_{BD}$。这次让 x′ 轴垂直于 BD，$F_{BD}$ 就消掉了。<br>$F_2$ 和 BD 夹 30°，所以和 x′ 轴夹 60°；BA 和 BD 夹 60°，所以和 x′ 轴夹 30°。两个力都在 x′ 轴的负方向一侧：$$ΣF_{x′}=0：-F_{BA}cos30°-F_2cos60°=0$$$$F_2=-#frac{cos30°}{cos60°}F_{BA}=-1.732F_{BA}$$'],
+      ['把两步接起来', '$F_{BA}$ 和 $F_{AB}$ 是同一根杆的力，代入：$$F_2=-1.732*(-0.897F_1)=1.553F_1$$$$#frac{F_1}{F_2}=#frac{cos15°}{1.5}≈0.644$$']
+    ]
+  }],
+  write: [
+    ['解：AC、AB、BD 均为二力杆，设各杆受拉。'],
+    ['(1) 取铰 A 为研究对象，x 轴水平（垂直于 AC）：'],
+    '$ΣF_x=0：F_1cos30°+F_{AB}cos15°=0 ⇒ F_{AB}=-#frac{cos30°}{cos15°}F_1=-0.897F_1$',
+    ['(2) 取铰 B 为研究对象，x′ 轴垂直于 BD：'],
+    '$ΣF_{x′}=0：-F_{BA}cos30°-F_2cos60°=0 ⇒ F_2=-#sqrt{3}F_{BA}$',
+    ['由 $F_{BA}=F_{AB}$ 得：'],
+    '$F_2=#sqrt{3}*0.897F_1=1.553F_1$，即 $#frac{F_1}{F_2}=#frac{cos15°}{1.5}≈0.644$',
+    ['答：$F_1$ ≈ 0.644 $F_2$（或写作 $F_2$ ≈ 1.553 $F_1$）。']
+  ],
+  ans: '$#frac{F_1}{F_2}=#frac{cos15°}{1.5}=#frac{#sqrt{6}+#sqrt{2}}{6}≈0.644$',
+  pit: [
+    '每个结点都让坐标轴垂直于一个不想要的未知力，这样每个点只要一个方程。',
+    'AB 和水平线夹 15° 是推出来的：45° + 60° = 105°，再减去 90°。图上没直接标。'
+  ]
+});
+
+/* ---------- 第 15 题 ---------- */
+function q15svg(cs) {
+  const A = [140, 390], B = [500, 390], C = [320, 210], P1 = [140, 210], P2 = [500, 210];
+  let s = '';
+  s += D.dim(140, 440, 320, 440, 'a') + D.dim(320, 440, 500, 440, 'a');
+  s += D.dim(560, 390, 560, 210, 'a', { off: 14 });
+  // 左半
+  s += D.rod([A, P1, C]) + D.fixed(A[0], A[1]) + D.pin(C[0], C[1]);
+  s += D.txt(122, 392, 'A') + D.txt(312, 196, 'C');
+  if (cs === 'a') s += D.arrow(48, 210, 132, 210, { l: 'F', lp: [70, 198] });
+  else { s += D.arrow(230, 138, 230, 203, { l: 'F', lp: [216, 172], la: 'end' }) + D.dim(140, 104, 230, 104, 'a/2'); }
+  // 右半（第 1 步起往右挪开）
+  let r = D.rod([C, P2, B], { hk: '1' }) + D.fixed(B[0], B[1]) + D.pin(C[0], C[1]) + D.txt(522, 392, 'B');
+  r += D.ln(C[0], C[1], B[0], B[1], 'dsh h', { s: 1 });
+  r += D.af(B[0], B[1], 44, 135, { c: 'u', s: 1, u: 4, g: 6, l: 'F_B', lp: [446, 378] });
+  r += D.af(C[0], C[1], 44, -45, { c: 'u', s: 1, g: 6, l: 'F_C′', lp: [384, 250] });
+  r += D.af(B[0], B[1], 62, 135, { c: 'r', s: 4, g: 6, l: 'F_B', lp: [430, 380], v: cs === 'a' ? '0.707F' : '0.354F', vp: [470, 324] });
+  s += `<g data-tk="1" data-tf="translate(28px,0px)">${r}</g>`;
+  s += D.note(330, 300, '右半边只在 B、C 两点受力 → 二力构件', { s: 1, u: 2 });
+  // 第 2 步：左半三力汇交
+  s += D.af(C[0], C[1], 58, 135, { c: 'u', s: 2, g: 6, l: 'F_C', lp: cs === 'a' ? [266, 152] : [304, 170] });
+  if (cs === 'a') {
+    s += D.ln(A[0], A[1], C[0], C[1], 'dsh h', { s: 2 });
+    s += `<circle cx="${C[0]}" cy="${C[1]}" r="9" class="focus"${at({ s: 2 })}/>`;
+    s += D.note(226, 262, '三个力都过 C 点', { s: 2, u: 4 });
+    s += D.ai(A[0], A[1], 62, 225, { c: 'u', s: 2, u: 4, l: 'F_A', lp: [208, 346] });
+    s += D.ai(A[0], A[1], 62, 225, { c: 'r', s: 4, l: 'F_A', lp: [208, 346], v: '0.707F', vp: [222, 366] });
+  } else {
+    const K = [230, 120];
+    s += D.ln(C[0], C[1], K[0], K[1], 'dsh h', { s: 2 }) + D.ln(A[0], A[1], K[0], K[1], 'dsh h', { s: 2 });
+    s += `<circle cx="${K[0]}" cy="${K[1]}" r="4.5" class="kdot"${at({ s: 2 })}/>`;
+    s += D.txt(214, 122, 'K', 'pt', { s: 2 });
+    s += D.af(A[0], A[1], 66, 71.57, { c: 'u', s: 2, u: 4, g: 6, l: 'F_A', lp: [190, 318] });
+    s += D.arc(A[0], A[1], 42, 0, 71.57, 'α', { s: 3, lo: 14 });
+    s += D.af(A[0], A[1], 76, 71.57, { c: 'r', s: 4, g: 6, l: 'F_A', lp: [190, 318], v: '0.791F', vp: [214, 340] });
+  }
+  return s;
+}
+const q15step1 = ['把右半边单独拿出来', '在 C 处拆开。右半边 BC 上没有外力，只在 B、C 两个铰处受力，所以它是<b>二力构件</b>：两个力等大、反向，都沿 B、C 的连线。B、C 水平差 a、竖直差 a，连线和水平线成 45°。<div class="tip"><b>二力构件不一定是直杆</b>　弯的、折的都行，只看它是不是只在两点受力。</div>'];
+reg({
+  id: 'p27-15', nav: '27·15', short: '三铰刚架',
+  tag: 'P27 · 第 15 题 · 平面汇交力系 · 图 1-2-18',
+  title: '三铰刚架受集中力，求 A、B 的约束力',
+  orig: '三铰门式刚架受集中力 F 作用，不计自重，试求图示 a、b 两种情况下铰支座 A、B 的约束力。',
+  given: '跨度 2a、高 a，C 为中间铰；图 a：水平力 F 作用在左上角；图 b：竖直力 F 作用在左半顶梁上、离左端 a/2',
+  ask: 'a、b 两种情况下 A、B 处的约束力',
+  know: [
+    ['三力平衡汇交', '一个物体只受三个力而平衡时，如果其中两个力的作用线交于一点，第三个力的作用线也必定过这一点。'],
+    ['二力构件', '只在两点受力的构件，不管形状直的弯的，两个力都沿这两点的连线。'],
+    ['两种情况分开看', '图上方可以切换图 a、图 b，两个的步骤不同。']
+  ],
+  sum: ['A、B 的约束力', '图 a：$F_A=F_B≈0.707F$；图 b：$F_A≈0.791F$，$F_B≈0.354F$'],
+  variants: [
+    {
+      label: '图 a　水平力', svg: () => q15svg('a'),
+      steps: [
+        ['先看懂图', '门形刚架由左右两半在顶部用铰链 C 连接，底部 A、B 是固定铰支座，这叫<b>三铰刚架</b>。图 a 中水平力 F 作用在左上角，向右。'],
+        q15step1,
+        ['左半边：三力平衡必汇交', '左半边受三个力：F、右半边在 C 处给它的力 $F_C$（沿 BC 连线）、A 处的力 $F_A$（方向暂时不知道）。<br>F 的作用线是顶部那条水平线，BC 连线也过 C，两条线交在 C 点。三力平衡必汇交，所以 $F_A$ 的作用线也过 C，沿 AC 方向，同样和水平成 45°。'],
+        ['列方程', '左半边上，$F_A$ 指向左下，$F_C$ 指向左上，都和水平线成 45°：$$ΣF_y=0：F_Csin45°-F_Asin45°=0 ⇒ F_A=F_C$$$$ΣF_x=0：F-F_Acos45°-F_Ccos45°=0 ⇒ F_A=#frac{F}{2cos45°}=#frac{#sqrt{2}}{2}F$$'],
+        ['结果', '$$F_A=F_B=F_C=#frac{#sqrt{2}}{2}F≈0.707F$$$F_A$ 沿 CA 方向指向左下；$F_B$ 沿 BC 方向指向左上（右半边受压）。']
+      ],
+      write: [
+        ['解：右半刚架 BC 只在 B、C 两处受力，为二力构件，$F_B$、$F_C$ 沿 BC 连线（与水平成 45°）。'],
+        ['取左半刚架 AC，受 F、$F_C$、$F_A$ 三力平衡，F 与 $F_C$ 交于 C 点，故 $F_A$ 也过 C 点，沿 AC 方向。'],
+        '$ΣF_y=0：F_Csin45°-F_Asin45°=0 ⇒ F_A=F_C$',
+        '$ΣF_x=0：F-F_Acos45°-F_Ccos45°=0 ⇒ F_A=#frac{#sqrt{2}}{2}F$',
+        ['答：$F_A=F_B=#frac{#sqrt{2}}{2}F$ ≈ 0.707F。$F_A$ 沿 CA 指向左下，$F_B$ 沿 BC 指向左上。']
+      ],
+      ans: '$F_A=F_B=#frac{#sqrt{2}}{2}F≈0.707F$，都沿 45° 方向（$F_A$ 指向左下，$F_B$ 指向左上）。'
+    },
+    {
+      label: '图 b　竖直力', svg: () => q15svg('b'),
+      steps: [
+        ['先看懂图', '同一个三铰刚架，图 b 中竖直向下的力 F 作用在左半边顶梁上，离左端 a/2。'],
+        q15step1,
+        ['左半边：找汇交点 K', '左半边受 F、$F_C$（沿 BC 连线）、$F_A$ 三个力。把 F 的作用线（竖直线）和 BC 连线延长，交于 K 点。三力平衡必汇交，$F_A$ 也必须过 K，沿 AK 方向。<br>K 在 A 右边 a/2、上面 a + a/2 = 1.5a，所以 AK 的倾角：$$tanα=#frac{1.5a}{0.5a}=3，α≈71.6°$$'],
+        ['列方程', '$F_A$ 指向右上（倾角 α），$F_C$ 指向左上（45°）：$$ΣF_x=0：F_Acosα-F_Ccos45°=0$$$$ΣF_y=0：F_Asinα+F_Csin45°-F=0$$由第一式 $F_Csin45°=F_Acosα$，代入第二式，并用 $sinα=#frac{3}{#sqrt{10}}$、$cosα=#frac{1}{#sqrt{10}}$：$$F_A=#frac{F}{sinα+cosα}=#frac{#sqrt{10}}{4}F≈0.791F$$$$F_C=#frac{F_Acosα}{cos45°}=#frac{#sqrt{2}}{4}F≈0.354F$$'],
+        ['结果', '$$F_A=#frac{#sqrt{10}}{4}F≈0.791F，F_B=F_C=#frac{#sqrt{2}}{4}F≈0.354F$$$F_A$ 沿 AK 指向右上，和水平线成 71.6°；$F_B$ 沿 BC 连线指向左上。']
+      ],
+      write: [
+        ['解：右半刚架 BC 为二力构件，$F_B$、$F_C$ 沿 BC 连线。'],
+        ['取左半刚架 AC，F 的作用线与 BC 连线交于 K 点，由三力平衡汇交定理，$F_A$ 沿 AK 方向，$tanα=#frac{1.5a}{0.5a}=3$。'],
+        '$ΣF_x=0：F_Acosα-F_Ccos45°=0$',
+        '$ΣF_y=0：F_Asinα+F_Csin45°-F=0$',
+        '$F_A=#frac{F}{sinα+cosα}=#frac{#sqrt{10}}{4}F≈0.791F，F_C=#frac{#sqrt{2}}{4}F≈0.354F$',
+        ['答：$F_A$ ≈ 0.791F，指向右上，与水平线成 71.6°；$F_B=F_C$ ≈ 0.354F，沿 BC 连线指向左上。']
+      ],
+      ans: '$F_A=#frac{#sqrt{10}}{4}F≈0.791F$（右上，与水平成 71.6°）；$F_B=#frac{#sqrt{2}}{4}F≈0.354F$（沿 BC 指向左上）。'
+    }
+  ],
+  pit: [
+    '先找二力构件。这题没有外力的是右半边，它是折线形状，照样算二力构件。',
+    '本节学的是汇交力系，所以用"三力平衡必汇交"定方向，再列投影方程。学了力矩以后，可以对 A 点取矩来验算。'
+  ]
+});
+
+/* ================= P36 平面力偶系 ================= */
+
+/* ---------- 第 7 题 ---------- */
+reg({
+  id: 'p36-7', nav: '36·7', short: '折杆结构受力偶',
+  tag: 'P36 · 第 7 题 · 平面力偶系 · 图 1-3-18',
+  title: '构件 AB 上作用力偶 M，求支座 A、C 的约束力',
+  orig: '在图 1-3-18 所示结构中，各构件的自重略去不计。在构件 AB 上作用一力偶矩为 M 的力偶，求支座 A 和 C 的约束力。',
+  given: '力偶矩 M（顺时针）作用在 AB 上；尺寸见图：A 上 2a、右 2a 到 B；B 下 a、右 a 到 C',
+  ask: '支座 A、C 的约束力',
+  know: [
+    ['力偶', '一对等大、反向、平行但不共线的力。它只让物体转，不让物体移动。力偶矩 $M=F·d$，d 是两力作用线间的垂直距离。'],
+    ['力偶只能用力偶平衡', '一个构件上只有一个力偶和两个约束力时，这两个约束力必定等大、反向、平行，自己组成一个力偶。'],
+    ['先找二力构件', '没有外力、只在两点受力的构件，力沿两点连线。它能直接定出另一个构件上力的方向。']
+  ],
+  sum: ['支座 A、C 的约束力', '$F_A=F_C=#frac{#sqrt{2}M}{4a}≈0.354M/a$'],
+  variants: [{
+    svg() {
+      const A = [130, 400], K1 = [130, 200], B = [330, 200], K2 = [330, 300], C = [430, 300];
+      let s = '';
+      s += D.ln(130, 300, 330, 300, 'dsh');
+      s += D.dim(130, 444, 330, 444, '2a') + D.dim(330, 444, 430, 444, 'a');
+      s += D.dim(60, 400, 60, 300, 'a') + D.dim(60, 300, 60, 200, 'a');
+      s += D.rod([A, K1, B], { hk: '3' }) + D.rod([B, K2, C], { hk: '2' });
+      s += D.fixed(A[0], A[1]) + D.fixed(C[0], C[1]) + D.pin(B[0], B[1]);
+      s += D.couple(230, 200, 24, true, 'M', { hk: '1' });
+      s += D.txt(112, 398, 'A') + D.txt(348, 190, 'B') + D.txt(452, 296, 'C');
+      // 第 2 步：BC 二力构件
+      const [e1, e2] = pol(B[0], B[1], 90, 135), [e3, e4] = pol(C[0], C[1], 80, -45);
+      s += D.ln(e1, e2, e3, e4, 'dsh h', { s: 2 });
+      s += D.af(B[0], B[1], 44, -45, { c: 'u', s: 2, u: 3, g: 6, l: 'F_B′', lp: [352, 252] });
+      s += D.af(C[0], C[1], 44, 135, { c: 'u', s: 2, u: 5, g: 6, l: 'F_C', lp: [414, 246] });
+      // 第 3 步：AB 上的力偶平衡
+      const [a1, a2] = pol(A[0], A[1], 100, 135), [a3, a4] = pol(A[0], A[1], 40, -45);
+      s += D.ln(a1, a2, a3, a4, 'dsh h', { s: 3 });
+      s += D.af(B[0], B[1], 60, 135, { c: 'u', s: 3, u: 5, g: 6, l: 'F_B', lp: [270, 146] });
+      s += D.ai(A[0], A[1], 60, -45, { c: 'u', s: 3, u: 5, l: 'F_A', lp: [96, 340] });
+      // 第 4 步：力偶臂
+      s += D.ln(A[0], A[1], B[0], B[1], 'dsh r', { s: 4 });
+      s += D.rt(B[0], B[1], 225, -45, 11, { s: 4 });
+      s += D.txt(240, 262, 'd = 2√2a', 'pt', { s: 4, a: 'end' });
+      // 第 5 步：结果
+      s += D.ai(A[0], A[1], 60, -45, { c: 'r', s: 5, l: 'F_A', lp: [96, 340], v: '√2M/(4a)', vp: [104, 322] });
+      s += D.af(B[0], B[1], 60, 135, { c: 'r', s: 5, g: 6, l: 'F_B', lp: [270, 146] });
+      s += D.af(C[0], C[1], 60, 135, { c: 'r', s: 5, g: 6, l: 'F_C', lp: [414, 236], v: '√2M/(4a)', vp: [466, 248], va: 'start' });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '结构由两个折杆组成：AB 从 A 往上 2a、再往右 2a 到 B；BC 从 B 往下 a、再往右 a 到 C。A、C 是固定铰支座，B 是连接两杆的铰链。力偶 M 作用在 AB 上，图中是<b>顺时针</b>。'],
+      ['什么是力偶', '力偶就是一对大小相等、方向相反、不在一条线上的平行力。它不会让物体移动，只会让物体转。转的效果用<b>力偶矩</b>衡量：$$M=F·d$$d 是两个力作用线之间的垂直距离，叫力偶臂。<div class="tip"><b>最重要的一条</b>　力偶只能用力偶来平衡，不能用一个力来平衡。</div>'],
+      ['BC 是二力构件', 'M 作用在 AB 上，BC 上没有外力，只在 B、C 两个铰处受力，所以 BC 是二力构件，$F_B′$ 和 $F_C$ 等大反向，沿 B、C 连线。B 比 C 高 a、靠左 a，连线和水平线成 45°。'],
+      ['AB：力偶只能由力偶平衡', 'AB 受三样东西：力偶 M、B 处的力 $F_B$（是 $F_B′$ 的反作用力，也沿 45° 方向）、A 处的力 $F_A$。<br>M 只能被一个力偶抵消，所以 $F_A$ 和 $F_B$ 必须平行、等大、反向，组成一个<b>逆时针</b>的力偶，正好抵消顺时针的 M。'],
+      ['求力偶臂 d', 'd 是两条平行作用线之间的垂直距离，也就是 A 点到 BC 连线的距离。<br>A→B 的连线是 45° 斜向右上，BC 连线是 45° 斜向右下，两者正好垂直（图中直角）。所以 d 就是 A、B 两点的直线距离：$$d=#sqrt{(2a)^2+(2a)^2}=2#sqrt{2}a$$'],
+      ['列力偶平衡方程', '$$ΣM=0：F_A·2#sqrt{2}a-M=0$$$$F_A=F_B=#frac{M}{2#sqrt{2}a}=#frac{#sqrt{2}M}{4a}≈0.354#frac{M}{a}$$又 $F_C=F_B′=F_B$。方向：$F_A$ 指向右下（与水平成 45°），$F_C$ 指向左上，BC 杆受压。']
+    ]
+  }],
+  write: [
+    ['解：BC 为二力构件，$F_B′$、$F_C$ 沿 BC 连线，与水平线成 45°。'],
+    ['取 AB 为研究对象，受力偶 M 作用。力偶只能由力偶平衡，故 $F_A$ 与 $F_B$ 等值、反向、平行，组成一力偶。'],
+    ['力偶臂 d 为 A 点到 BC 连线的距离。AB 连线与 BC 连线垂直，故'],
+    '$d=#sqrt{(2a)^2+(2a)^2}=2#sqrt{2}a$',
+    '$ΣM=0：F_A·d-M=0 ⇒ F_A=#frac{M}{2#sqrt{2}a}=#frac{#sqrt{2}M}{4a}$',
+    ['答：$F_A=F_C=#frac{#sqrt{2}M}{4a}$，方向沿 45° 线，$F_A$ 指向右下，$F_C$ 指向左上。']
+  ],
+  ans: '$F_A=F_C=#frac{#sqrt{2}M}{4a}≈0.354M/a$，方向平行于 BC 连线（45°），$F_A$ 指向右下、$F_C$ 指向左上。',
+  pit: [
+    'M 加在 AB 上，所以二力构件是 BC，不是 AB。',
+    '力偶臂是两条作用线之间的垂直距离，不是杆长，也不是 2a 或 3a。'
+  ]
+});
+
+/* ---------- 第 8 题 ---------- */
+function q8svg(p, mode) {
+  const A = [110, 250], B = [510, 250], l = 400;
+  const th = mode === 'c' ? p.th : 0, pos = mode === 'c' ? 0.5 : p.pos, mx = A[0] + l * pos;
+  let s = '';
+  s += D.rod([A, B]);
+  s += D.fixed(A[0], A[1]);
+  if (mode === 'c') {
+    s += D.roller(B[0], B[1], -th);
+    const st = Math.sin(th * RAD), ct = Math.cos(th * RAD), Qx = B[0] + 25 * st, Qy = B[1] + 25 * ct;
+    s += D.ln(Qx, Qy, Qx + 78 * ct, Qy - 78 * st, 'ln') + D.ln(Qx, Qy, Qx + 92, Qy, 'dsh');
+    s += D.arc(Qx, Qy, 56, 0, th, 'θ', { lo: 14 });
+  } else s += D.roller(B[0], B[1]);
+  s += D.couple(mx, A[1], 22, true, 'M');
+  const lbl = Math.abs(pos - 0.5) < 0.006 ? 'l/2' : Math.abs(pos - 1 / 3) < 0.006 ? 'l/3' : pos.toFixed(2) + 'l';
+  s += D.dim(A[0], 160, mx, 160, lbl) + D.ln(mx, 166, mx, 222, 'dm');
+  s += D.dim(A[0], 330, B[0], 330, 'l', { off: 18 });
+  s += D.txt(92, 244, 'A') + D.txt(536, 240, 'B');
+  if (mode !== 'c') {
+    s += D.af(B[0], B[1], 66, 90, { c: 'u', s: 1, u: 3, g: 6, l: 'F_B', lp: [532, 196], la: 'start' });
+    s += D.note(A[0], 214, 'A 处方向？', { s: 1, u: 2 });
+    s += D.ln(A[0], 120, A[0], 300, 'dsh', { s: 2 }) + D.ln(B[0], 120, B[0], 300, 'dsh', { s: 2 });
+    s += D.ai(A[0], A[1], 62, 270, { c: 'u', s: 2, u: 3, l: 'F_A', lp: [94, 196], la: 'end' });
+    s += D.ai(A[0], A[1], 62, 270, { c: 'r', s: 3, l: 'F_A', lp: [94, 196], la: 'end', v: 'M/l', vp: [94, 216], va: 'end' });
+    s += D.af(B[0], B[1], 66, 90, { c: 'r', s: 3, g: 6, l: 'F_B', lp: [532, 196], la: 'start', v: 'M/l', vp: [532, 216], va: 'start' });
+    s += D.note(310, 420, '拖动下面的滑块移动 M，答案不变', { s: 4, c: 'r' });
+  } else {
+    const st = Math.sin(th * RAD), ct = Math.cos(th * RAD);
+    const lpB = (len) => { const q = pol(B[0], B[1], len + 18, 90 + th); return [q[0] + 18, q[1]]; };
+    s += D.af(B[0], B[1], 66, 90 + th, { c: 'u', s: 1, u: 4, g: 6, l: 'F_B', lp: lpB(66) });
+    const [b1, b2] = pol(B[0], B[1], 60, 270 + th), [b3, b4] = pol(B[0], B[1], l * st + 50, 90 + th);
+    const [a1, a2] = pol(A[0], A[1], 120, 90 + th), [a3, a4] = pol(A[0], A[1], 50, 270 + th);
+    s += D.ln(b1, b2, b3, b4, 'dsh', { s: 2 }) + D.ln(a1, a2, a3, a4, 'dsh', { s: 2 });
+    const lpA = (() => { const q = pol(A[0], A[1], 82, 90 + th); return [q[0] - 14, q[1]]; })();
+    s += D.ai(A[0], A[1], 62, 270 + th, { c: 'u', s: 2, u: 4, l: 'F_A', lp: lpA });
+    const Fx = A[0] + l * ct * ct, Fy = A[1] - l * st * ct;
+    s += D.ln(A[0], A[1], Fx, Fy, 'dsh r', { s: 3 });
+    s += D.rt(Fx, Fy, 180 + th, 270 + th, 10, { s: 3 });
+    const [mlx, mly] = pol((A[0] + Fx) / 2, (A[1] + Fy) / 2, 24, 270 + th);
+    s += D.txt(mlx, mly, 'd = l cosθ', 'pt', { s: 3 });
+    s += D.ai(A[0], A[1], 62, 270 + th, { c: 'r', s: 4, l: 'F_A', lp: lpA });
+    s += D.af(B[0], B[1], 66, 90 + th, { c: 'r', s: 4, g: 6, l: 'F_B', lp: lpB(66) });
+    s += D.txt(310, 420, 'F_A = F_B = M / (l cosθ)', 'big', { s: 4 });
+  }
+  return s;
+}
+const q8ab = (which) => [
+  ['先看懂图', `简支梁 AB 长 l，A 是固定铰支座，B 是活动铰支座（下面有滚轮）。梁上作用一个顺时针的力偶 M，位置离 A 点 ${which}。`],
+  ['B 处的约束力只能竖直', '活动铰支座只能阻止梁沿垂直于支承面的方向移动，所以 $F_B$ 垂直于支承面。这里支承面水平，$F_B$ 就是竖直的。A 是固定铰支座，力的方向暂时不知道。'],
+  ['力偶只能由力偶平衡', '梁上只有一个主动力偶 M。要平衡它，$F_A$ 和 $F_B$ 必须组成一个反向的力偶：$F_A$ 与 $F_B$ 平行（都竖直）、等大、反向。M 是顺时针，这对力就要逆时针：$F_B$ 向上、$F_A$ 向下。'],
+  ['列方程', '两个力的作用线都是竖直的，相距 l，力偶臂 d = l：$$ΣM=0：F_B·l-M=0 ⇒ F_A=F_B=#frac{M}{l}$$'],
+  ['动手试：把 M 挪个位置', '拖动图下面的滑块移动力偶，答案始终是 M/l。力偶对平面内任意一点的矩都等于 M，和它放在梁上哪个位置没有关系，所以图 a、图 b 的答案一样。']
+];
+reg({
+  id: 'p36-8', nav: '36·8', short: '梁上力偶三种支座',
+  tag: 'P36 · 第 8 题 · 平面力偶系 · 图 1-3-19',
+  title: '梁上作用力偶 M，求 a、b、c 三种情况下 A、B 的约束力',
+  orig: '已知梁 AB 上作用一力偶，力偶矩为 M，梁长为 l，梁重不计。求在图 1-3-19 所示情况下，支座 A 和 B 的约束力。',
+  given: '力偶矩 M（顺时针），梁长 l；图 a 力偶在 l/2，图 b 在 l/3，图 c 的 B 支座放在倾角 θ 的斜面上',
+  ask: '三种情况下 A、B 的约束力',
+  know: [
+    ['活动铰支座', '只能挡住垂直于支承面方向的移动，约束力垂直于支承面。'],
+    ['力偶只能由力偶平衡', '梁上只有力偶 M，A、B 两处的约束力一定等大、反向、平行，组成一个力偶。'],
+    ['力偶可以随便挪', '力偶在自己的平面内移到哪里，对物体的作用都一样。所以 a、b 答案相同。']
+  ],
+  sum: ['三种情况 A、B 的约束力', '图 a、b：$F_A=F_B=M/l$；图 c：$F_A=F_B=#frac{M}{lcosθ}$'],
+  variants: [
+    {
+      label: '图 a', params: { pos: { min: 0.15, max: 0.85, step: 0.01, val: 0.5, label: '力偶离 A 点的距离', fmt: v => v.toFixed(2) + ' l' } },
+      readout: p => `力偶离 A 点 ${p.pos.toFixed(2)} l 时：$F_A=F_B=M/l$，<b>不变</b>。`,
+      svg: p => q8svg(p, 'ab'), steps: q8ab('l/2'),
+      ans: '$F_A=F_B=#frac{M}{l}$，$F_B$ 竖直向上，$F_A$ 竖直向下。'
+    },
+    {
+      label: '图 b', params: { pos: { min: 0.15, max: 0.85, step: 0.01, val: 0.33, label: '力偶离 A 点的距离', fmt: v => v.toFixed(2) + ' l' } },
+      readout: p => `力偶离 A 点 ${p.pos.toFixed(2)} l 时：$F_A=F_B=M/l$，<b>不变</b>。`,
+      svg: p => q8svg(p, 'ab'), steps: q8ab('l/3'),
+      ans: '$F_A=F_B=#frac{M}{l}$，和图 a 相同。'
+    },
+    {
+      label: '图 c　斜面', params: { th: { min: 10, max: 60, step: 1, val: 30, label: '斜面倾角 θ', fmt: v => v + '°' } },
+      readout: p => { const c = Math.cos(p.th * RAD); return `θ = ${p.th}°，cosθ = ${c.toFixed(3)}，$F_A=F_B=#frac{M}{lcosθ}$ = <b>${(1 / c).toFixed(3)} M/l</b>`; },
+      svg: p => q8svg(p, 'c'),
+      steps: [
+        ['先看懂图', '梁和力偶跟图 a 一样，只是 B 处的活动铰支座放在倾角为 θ 的斜面上。<div class="tip"><b>拖动图下面的滑块</b>　改变斜面倾角 θ，看约束力怎么变。</div>'],
+        ['B 处的力垂直于斜面', '活动铰支座的约束力垂直于支承面。支承面倾斜了 θ，$F_B$ 也就偏离竖直方向 θ 角，斜向左上。'],
+        ['$F_A$ 与 $F_B$ 组成力偶', '道理同图 a：力偶只能由力偶平衡，$F_A$ 与 $F_B$ 平行、等大、反向，所以 $F_A$ 也偏离竖直 θ 角，指向右下。'],
+        ['力偶臂变短了', '两条斜作用线之间的垂直距离不再是 l。从 A 向 $F_B$ 的作用线作垂线（图中直角），得：$$d=lcosθ$$'],
+        ['列方程', '$$ΣM=0：F_B·lcosθ-M=0 ⇒ F_A=F_B=#frac{M}{lcosθ}$$θ = 0 时就回到图 a 的 M/l；θ 越大，cosθ 越小，约束力越大。']
+      ],
+      ans: '$F_A=F_B=#frac{M}{lcosθ}$，$F_B$ 垂直于斜面指向左上，$F_A$ 与它平行、反向。'
+    }
+  ],
+  write: [
+    ['解：B 为活动铰支座，$F_B$ 垂直于支承面。梁上只有力偶 M，力偶只能由力偶平衡，故 $F_A$ 与 $F_B$ 组成一力偶。'],
+    ['(a)(b) $F_A$、$F_B$ 均沿铅直方向，力偶臂 d = l：'],
+    '$ΣM=0：F_B·l-M=0 ⇒ F_A=F_B=#frac{M}{l}$',
+    ['(c) $F_B$ 垂直于斜面，与铅直线成 θ 角，$F_A∥F_B$，力偶臂 d = lcosθ：'],
+    '$ΣM=0：F_B·lcosθ-M=0 ⇒ F_A=F_B=#frac{M}{lcosθ}$',
+    ['答：(a)(b) $F_A=F_B=M/l$，$F_B$ 向上、$F_A$ 向下；(c) $F_A=F_B=#frac{M}{lcosθ}$，方向与铅直线成 θ 角。']
+  ],
+  pit: [
+    '力偶在梁上的位置不影响约束力，(a)(b) 答案一样。',
+    '(c) 的力偶臂是两条斜作用线的垂直距离 lcosθ，不是 l。'
+  ]
+});
+
+/* ---------- 第 9 题 ---------- */
+function gearPath(cx, cy, R, z, ph) {
+  const ad = 7, dd = 7, p = 360 / z; let d = '';
+  for (let k = 0; k < z; k++) {
+    const c = ph + k * p;
+    [[R - dd, c - 0.5 * p], [R - dd, c - 0.27 * p], [R + ad, c - 0.15 * p], [R + ad, c + 0.15 * p], [R - dd, c + 0.27 * p]].forEach(([r, a], i) => {
+      const [x, y] = pol(cx, cy, r, a); d += (k === 0 && i === 0 ? 'M' : 'L') + f(x) + ',' + f(y) + ' ';
+    });
+  }
+  return d + 'Z';
+}
+function gearBody(cx, cy, R, z, ph) {
+  let s = `<path d="${gearPath(cx, cy, R, z, ph)}" class="body"/>`;
+  for (let k = 0; k < 5; k++) { const [x, y] = pol(cx, cy, R * 0.56, k * 72 + 18); s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(R * 0.15)}" class="hole"/>`; }
+  return s + `<circle cx="${cx}" cy="${cy}" r="17" class="body"/>`;
+}
+reg({
+  id: 'p36-9', nav: '36·9', short: '两齿轮啮合',
+  tag: 'P36 · 第 9 题 · 平面力偶系 · 图 1-3-20',
+  title: '一对齿轮匀速转动，求阻力偶 M₂ 和轴承力',
+  orig: '两齿轮的半径分别为 $r_1$、$r_2$，作用于轮 I 上的主动力偶的力偶矩为 $M_1$，齿轮的压力角为 θ，不计两齿轮的重量。求使二轮维持匀速转动时齿轮 II 的阻力偶矩 $M_2$ 及轴承 $O_1$、$O_2$ 的约束力的大小和方向。',
+  given: '$r_1$、$r_2$、$M_1$、压力角 θ',
+  ask: '阻力偶矩 $M_2$；轴承 $O_1$、$O_2$ 的约束力',
+  know: [
+    ['匀速转动也是平衡', '转速不变时，作用在齿轮上的力和力偶都平衡。'],
+    ['齿面力沿啮合线', '两齿接触处的压力沿一条固定斜线（啮合线），它和两轮公切线的夹角 θ 就是压力角。'],
+    ['力偶只能由力偶平衡', '每个齿轮上：一个力偶 + 齿面力 + 轴承力。齿面力和轴承力必定组成一个力偶。']
+  ],
+  sum: ['$M_2$ 和轴承力', '$M_2=#frac{r_2}{r_1}M_1$，$F_{O1}=F_{O2}=#frac{M_1}{r_1cosθ}$'],
+  variants: [{
+    tools: [{ label: '暂停转动', on: (w, b) => { w.classList.toggle('paused'); b.textContent = w.classList.contains('paused') ? '继续转动' : '暂停转动'; } }],
+    svg() {
+      const O2 = [200, 235], r2 = 125, O1 = [408.3, 235], r1 = 83.3, P = [325, 235];
+      let s = '';
+      s += `<g${at({ dk: 2, du: 3 })}><g class="spin" style="transform-origin:${O2[0]}px ${O2[1]}px;animation-duration:15s">${gearBody(O2[0], O2[1], r2, 24, 0)}</g></g>`;
+      s += `<g${at({ dk: 3, du: 4 })}><g class="spin ccw" style="transform-origin:${O1[0]}px ${O1[1]}px;animation-duration:10s">${gearBody(O1[0], O1[1], r1, 16, 11.25)}</g></g>`;
+      s += `<circle cx="${O2[0]}" cy="${O2[1]}" r="${r2}" class="dsh"/><circle cx="${O1[0]}" cy="${O1[1]}" r="${r1}" class="dsh"/>`;
+      s += D.fixed(O2[0], O2[1]) + D.fixed(O1[0], O1[1]);
+      const [q2x, q2y] = pol(O2[0], O2[1], r2, 145), [q1x, q1y] = pol(O1[0], O1[1], r1, 35);
+      s += D.ln(O2[0], O2[1], q2x, q2y, 'ln') + D.ln(O1[0], O1[1], q1x, q1y, 'ln');
+      s += D.txt(132, 196, 'r_2') + D.txt(452, 200, 'r_1');
+      s += `<text x="200" y="168" class="pt rm" text-anchor="middle">II</text><text x="408" y="182" class="pt rm" text-anchor="middle">I</text>`;
+      s += D.txt(178, 268, 'O_2') + D.txt(386, 268, 'O_1');
+      s += D.couple(O1[0], O1[1], r1 + 24, false, 'M_1', { a1: 8, a2: 112, lp: [496, 118] });
+      s += D.couple(O2[0], O2[1], r2 + 20, false, 'M_2', { a1: 62, a2: 168, c: 'u', u: 4, lp: [118, 92] });
+      // 第 1 步：啮合线
+      const [l1, l2] = pol(P[0], P[1], 180, 250), [l3, l4] = pol(P[0], P[1], 180, 70);
+      s += D.ln(l1, l2, l3, l4, 'dsh h', { s: 1 }) + D.ln(325, 70, 325, 400, 'dsh', { s: 1 });
+      s += D.arc(P[0], P[1], 72, 70, 90, 'θ', { s: 1, lo: 14 });
+      s += D.note(388, 60, '啮合线', { s: 1, a: 'start' }) + D.note(316, 78, '公切线', { s: 1, a: 'end' });
+      s += `<circle cx="${P[0]}" cy="${P[1]}" r="3.5" class="kdot"${at({ s: 1 })}/>`;
+      // 第 2 步：轮 I
+      const T1 = [334.75, 208.2], T2 = [310.4, 275.2];
+      s += D.af(P[0], P[1], 80, 70, { c: 'u', s: 2, u: 4, l: 'F_n', lp: [372, 166] });
+      s += D.af(O1[0], O1[1], 80, 250, { c: 'u', s: 2, u: 4, g: 6, l: 'F_{O1}', lp: [362, 334] });
+      s += D.ln(O1[0], O1[1], T1[0], T1[1], 'dsh r', { s: 2, u: 3 }) + D.rt(T1[0], T1[1], 340, 70, 9, { s: 2, u: 3 });
+      s += D.txt(372, 214, 'r_1cosθ', 'pt', { s: 2, u: 3, a: 'start' });
+      // 第 3 步：轮 II
+      s += D.af(P[0], P[1], 80, 250, { c: 'u', s: 3, u: 4, l: 'F_n′', lp: [276, 322] });
+      s += D.af(O2[0], O2[1], 80, 70, { c: 'u', s: 3, u: 4, g: 6, l: 'F_{O2}', lp: [252, 148] });
+      s += D.ln(O2[0], O2[1], T2[0], T2[1], 'dsh r', { s: 3, u: 4 }) + D.rt(T2[0], T2[1], 70, 160, 9, { s: 3, u: 4 });
+      s += D.txt(236, 286, 'r_2cosθ', 'pt', { s: 3, u: 4, a: 'end' });
+      // 第 4 步：结果
+      s += D.af(P[0], P[1], 80, 70, { c: 'r', s: 4, l: 'F_n', lp: [372, 166] });
+      s += D.af(P[0], P[1], 80, 250, { c: 'r', s: 4, l: 'F_n′', lp: [276, 322] });
+      s += D.af(O1[0], O1[1], 80, 250, { c: 'r', s: 4, g: 6, l: 'F_{O1}', lp: [362, 334] });
+      s += D.af(O2[0], O2[1], 80, 70, { c: 'r', s: 4, g: 6, l: 'F_{O2}', lp: [252, 148] });
+      s += D.couple(O2[0], O2[1], r2 + 20, false, 'M_2', { a1: 62, a2: 168, c: 'r', s: 4, lp: [118, 92] });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '两个齿轮咬合在一起。右边轮 I 半径 $r_1$，加了主动力偶 $M_1$（逆时针），带着左边轮 II（半径 $r_2$）转。轮 II 上有阻力偶 $M_2$。要求 $M_2$ 多大才能让两轮<b>匀速</b>转，以及两个轴承给齿轮的力。<div class="tip"><b>匀速转动也是平衡</b>　和匀速直线运动一样，转速不变时力和力偶都平衡。</div>'],
+      ['齿和齿之间的力沿啮合线', '两个齿接触时，相互的压力垂直于齿面，沿着一条固定的斜线，叫<b>啮合线</b>。它和两轮的公切线（过接触点的竖直线）夹一个角 θ，叫<b>压力角</b>。图里 θ 画成 20°，这是最常用的标准值。'],
+      ['取轮 I', '轮 I 受：力偶 $M_1$、轮 II 的齿给它的力 $F_n$（沿啮合线）、轴承 $O_1$ 的力 $F_{O1}$。<br>力偶只能由力偶平衡，所以 $F_{O1}$ 和 $F_n$ 平行、等大、反向，组成一个力偶。力偶臂是 $O_1$ 到啮合线的垂直距离 $r_1cosθ$：$$ΣM=0：M_1-F_n·r_1cosθ=0$$$$F_n=F_{O1}=#frac{M_1}{r_1cosθ}$$'],
+      ['取轮 II', '轮 I 推轮 II 的力 $F_n′$ 和 $F_n$ 是作用力与反作用力，等大反向。轮 II 受 $F_n′$、轴承力 $F_{O2}$、阻力偶 $M_2$。同样，$F_{O2}$ 与 $F_n′$ 组成力偶，力偶臂 $r_2cosθ$：$$ΣM=0：F_n′·r_2cosθ-M_2=0$$$$M_2=F_n·r_2cosθ=#frac{r_2}{r_1}M_1$$$$F_{O2}=F_n′=#frac{M_1}{r_1cosθ}$$'],
+      ['结果和方向', '$$M_2=#frac{r_2}{r_1}M_1，F_{O1}=F_{O2}=#frac{M_1}{r_1cosθ}$$$F_{O1}$、$F_{O2}$ 都沿啮合线方向：$F_{O1}$ 指向左下，$F_{O2}$ 指向右上。大齿轮上的力偶矩是小齿轮的 $r_2/r_1$ 倍，齿轮"减速增扭"就是这个道理。']
+    ]
+  }],
+  write: [
+    ['解：(1) 取轮 I 为研究对象。齿面压力 $F_n$ 沿啮合线，与公切线成 θ 角。力偶只能由力偶平衡，$F_{O1}$ 与 $F_n$ 组成力偶。'],
+    '$ΣM=0：M_1-F_n·r_1cosθ=0 ⇒ F_n=F_{O1}=#frac{M_1}{r_1cosθ}$',
+    ['(2) 取轮 II 为研究对象。$F_n′=F_n$，$F_{O2}$ 与 $F_n′$ 组成力偶。'],
+    '$ΣM=0：F_n′·r_2cosθ-M_2=0 ⇒ M_2=#frac{r_2}{r_1}M_1$',
+    '$F_{O2}=F_n′=#frac{M_1}{r_1cosθ}$',
+    ['答：$M_2=#frac{r_2}{r_1}M_1$；$F_{O1}=F_{O2}=#frac{M_1}{r_1cosθ}$，方向沿啮合线，分别与各轮所受齿面压力反向。']
+  ],
+  ans: '$M_2=#frac{r_2}{r_1}M_1$；$F_{O1}=F_{O2}=#frac{M_1}{r_1cosθ}$，沿啮合线方向（与公切线成 θ 角）。',
+  pit: [
+    '力偶臂是轴心到啮合线的垂直距离 $rcosθ$，不是半径 r。',
+    '轴承力和齿面力组成力偶，所以轴承力也沿啮合线方向，不是水平或竖直。'
+  ]
+});
+
+/* ---------- 第 10 题 ---------- */
+reg({
+  id: 'p36-10', nav: '36·10', short: '曲柄滑块机构',
+  tag: 'P36 · 第 10 题 · 平面力偶系 · 图 1-3-21',
+  title: '曲柄滑块机构平衡，求曲柄上的力偶矩 M',
+  orig: '曲柄滑块机构在图 1-3-21 所示位置处于平衡状态。已知 F = 100 kN，曲柄 AB = r = 1 m。试求作用于曲柄 AB 上的力偶矩 M 的大小。',
+  given: 'F = 100 kN（水平向左推滑块）；AB = r = 1 m；AB 与水平成 45°，BC 与水平成 30°',
+  ask: '曲柄 AB 上的力偶矩 M',
+  know: [
+    ['连杆是二力杆', 'BC 两端铰接、中间不受力，力沿 BC。'],
+    ['先算滑块', '滑块上水平方向只有 F 和连杆力，一个方程就能求出连杆力。'],
+    ['力偶只能由力偶平衡', '曲柄上有力偶 M，A、B 两处的力必定组成一个反向力偶。']
+  ],
+  sum: ['曲柄上的力偶矩 M', 'M ≈ 111.5 kN·m（顺时针）'],
+  variants: [{
+    svg() {
+      const A = [110, 380], B = [251.4, 238.6], C = [496.3, 380], Fp = [206.6, 212.7];
+      let s = '';
+      s += D.ln(A[0], A[1], C[0], C[1], 'dsh');
+      s += D.hatch(430, 352, 578, 352, -1) + D.hatch(430, 408, 578, 408, 1);
+      s += `<rect x="468" y="358" width="56" height="44" class="body"/>`;
+      s += D.rod([A, B], { hk: '3' }) + D.rod([B, C], { hk: '1' });
+      s += D.fixed(A[0], A[1]) + D.pin(B[0], B[1]) + D.pin(C[0], C[1]);
+      s += D.arrow(608, 380, 530, 380, { l: 'F', lp: [586, 368], v: '100 kN', vp: [574, 398] });
+      s += D.arc(A[0], A[1], 50, 0, 45, '45°', { lo: 16 });
+      s += D.arc(C[0], C[1], 66, 150, 180, '30°', { lo: 16 });
+      s += D.couple(180.7, 309.3, 22, true, 'M', { lp: [218, 300], u: 5 });
+      s += D.txt(90, 400, 'A') + D.txt(252, 222, 'B') + D.txt(508, 396, 'C');
+      s += D.note(220, 342, 'AB = r = 1 m', { a: 'start' });
+      // 第 2 步：滑块
+      s += D.af(C[0], C[1], 52, 90, { c: 'u', s: 2, u: 5, g: 6, l: 'F_N', lp: [516, 330], la: 'start' });
+      s += D.ai(C[0], C[1], 70, -30, { c: 'u', s: 2, u: 5, l: 'F_{BC}', lp: [420, 330] });
+      // 第 3 步：曲柄
+      s += D.af(B[0], B[1], 70, 150, { c: 'u', s: 3, u: 5, g: 6, l: 'F_B', lp: [172, 190] });
+      s += D.ai(A[0], A[1], 64, 330, { c: 'u', s: 3, u: 5, l: 'F_A', lp: [36, 332] });
+      // 第 4 步：力偶臂
+      const [ex, ey] = pol(B[0], B[1], 88, 150);
+      s += D.ln(B[0], B[1], ex, ey, 'dsh', { s: 4 });
+      s += D.ln(A[0], A[1], Fp[0], Fp[1], 'dsh r', { s: 4 });
+      s += D.rt(Fp[0], Fp[1], 240, 330, 10, { s: 4 });
+      s += D.txt(136, 286, 'd', 'pt', { s: 4 });
+      s += D.arc(B[0], B[1], 30, 150, 225, '75°', { s: 4, lo: 14 });
+      // 第 5 步：结果
+      s += D.couple(180.7, 309.3, 22, true, 'M', { c: 'r', s: 5, lp: [218, 300] });
+      s += D.txt(330, 446, 'M = F_{BC} · d ≈ 115.5 × 0.966 ≈ 111.5 kN·m', 'big', { s: 5 });
+      return s;
+    },
+    steps: [
+      ['先看懂图', '曲柄 AB 绕固定铰 A 转，连杆 BC 一端接 B，另一端接滑块 C，滑块只能在水平导轨里滑。滑块上有水平力 F = 100 kN 往左推，曲柄上加力偶 M 顶住，整个机构不动。AB 和水平线成 45°，BC 和水平线成 30°，AB = r = 1 m。'],
+      ['BC 是二力杆', '连杆 BC 两端铰接、中间不受力，是二力杆，力沿 BC 方向。M 作用在曲柄 AB 上，所以 AB 不是二力杆。<br>思路：先从滑块求出 BC 杆的力，再到曲柄上用力偶平衡。'],
+      ['取滑块 C', '滑块受：F（向左）、导轨的支持力 $F_N$（竖直）、连杆的力 $F_{BC}$（沿 BC）。水平方向只有 F 和 $F_{BC}$：$$ΣF_x=0：F_{BC}cos30°-F=0$$$$F_{BC}=#frac{F}{cos30°}=#frac{100}{0.866}=115.5 #t{kN}$$连杆在推滑块，BC 受压。'],
+      ['取曲柄 AB：力偶只能由力偶平衡', '曲柄受：力偶 M、连杆在 B 点的力 $F_B$（= 115.5 kN，沿 CB 方向斜向左上）、A 处的力 $F_A$。<br>力偶只能被力偶平衡，所以 $F_A$ 和 $F_B$ 平行、等大、反向，组成一个力偶抵消 M。'],
+      ['求力偶臂 d', 'd 是 A 点到 BC 连线的垂直距离，要把 CB 往左上延长再作垂线。<br>三角形 ABC 中，B 处的内角 = 180° − 45° − 30° = 105°，所以 BA 和 CB 延长线的夹角是 180° − 105° = 75°（图中标出）。在直角三角形里：$$d=r·sin75°=1*0.966=0.966 #t{m}$$'],
+      ['列方程', '$$ΣM=0：M-F_B·d=0$$$$M=115.5*0.966≈111.5 #t{kN·m}$$M 是顺时针，和题图画的一致。']
+    ]
+  }],
+  write: [
+    ['解：连杆 BC 为二力杆。'],
+    ['(1) 取滑块 C 为研究对象：'],
+    '$ΣF_x=0：F_{BC}cos30°-F=0 ⇒ F_{BC}=#frac{F}{cos30°}=#frac{100}{0.866}=115.5 #t{kN}$',
+    ['(2) 取曲柄 AB 为研究对象。力偶只能由力偶平衡，$F_A$ 与 $F_B$ 组成力偶，$F_B=F_{BC}$ = 115.5 kN。力偶臂：'],
+    '$d=AB·sin(45°+30°)=1*sin75°=0.966 #t{m}$',
+    '$ΣM=0：M-F_B·d=0 ⇒ M=115.5*0.966≈111.5 #t{kN·m}$',
+    ['答：作用于曲柄 AB 上的力偶矩 M ≈ 111.5 kN·m，顺时针。']
+  ],
+  ans: '$M=#frac{F·r·sin75°}{cos30°}≈111.5 #t{kN·m}$，顺时针。',
+  pit: [
+    '先算滑块：滑块上只有两个力有水平分量，一个方程就能求出连杆力。',
+    '力偶臂是 A 到 BC 延长线的距离，不是 AB 的长度 r。'
+  ]
+});
+
+/* ================= 入门页、汇总页、导航 ================= */
+function introHTML() {
+  const fig = (svg, cap) => `<figure><svg viewBox="0 0 160 130">${svg}</svg><figcaption>${T(cap)}</figcaption></figure>`;
+  const c1 = D.hatch(40, 18, 120, 18, -1) + D.ln(80, 18, 80, 76, 'rope') + `<rect x="58" y="76" width="44" height="32" class="body"/>` + D.af(80, 76, 40, 90, { c: 'u', l: 'F_T', lp: [104, 52] });
+  const c2 = D.fixed(80, 78) + D.af(80, 78, 46, 0, { c: 'u', g: 6, l: 'F_x', lp: [140, 70] }) + D.af(80, 78, 46, 90, { c: 'u', g: 6, l: 'F_y', lp: [100, 26] });
+  const c3 = D.roller(80, 80) + D.af(80, 80, 50, 90, { c: 'u', g: 6, l: 'F_N', lp: [104, 30] });
+  const c4 = D.rod([[34, 98], [126, 44]]) + D.pin(34, 98) + D.pin(126, 44) + D.af(126, 44, 26, 30.4, { c: 'u', g: 6, l: 'F', lp: [146, 16] }) + D.af(34, 98, 26, 210.4, { c: 'u', g: 6, l: 'F′', lp: [16, 124] });
+  const cp = D.rod([[60, 85], [340, 85]]) + D.af(110, 85, 52, 270, { g: 6, l: 'F', lp: [94, 140] }) + D.af(290, 85, 52, 90, { g: 6, l: 'F′', lp: [310, 36] }) + D.dim(110, 155, 290, 155, 'd') + D.couple(200, 85, 26, false, 'M', { c: 'r' });
+  const items = PROBS.map(p => `<tr><td><a href="#${p.id}">${p.nav}</a></td><td>${p.short}</td><td>${T(p.sum[0])}</td></tr>`).join('');
+  return `<article>
+    <div class="tag">开始之前</div>
+    <div class="ph"><h2>先花 5 分钟，把这几样东西认熟</h2></div>
+    <p class="lead">这次作业是 P27 平面汇交力系 7 题、P36 平面力偶系 4 题，共 11 题，用到的东西都在这一页。每道题的讲解页左边是图，右边是步骤；点"下一步"或按键盘 <span class="kbd">→</span>，图上的力会一步步画出来。颜色是固定的：<b style="color:var(--known)">红色</b>是已知的力，<b style="color:var(--unk)">蓝色</b>是要求的力，<b style="color:var(--res)">绿色</b>是算出来的结果。</p>
+    <div class="pr">
+      <div class="prc">
+        <h3>1　力是一支有方向的箭头</h3>
+        <p>力有三个要素：大小、方向、作用点。斜着的力可以拆成水平、竖直两部分，叫<b>投影</b>。拖动滑块看看：</p>
+        <svg id="projsvg" viewBox="0 0 400 220"></svg>
+        <div class="ctrl" style="border:none;padding:0"><label><span>力和水平线的夹角 α</span><span id="projv">30°</span></label><input type="range" id="proj" min="0" max="90" step="1" value="30"></div>
+        <div class="readout" id="projro"></div>
+      </div>
+      <div class="prc">
+        <h3>2　平衡就是"合起来等于零"</h3>
+        <p>物体静止、匀速直线运动、匀速转动，都叫<b>平衡</b>。平衡时：</p>
+        <div><b>汇交力系</b>（所有力交于一点）$$ΣF_x=0，ΣF_y=0$$两个方程，最多解出两个未知量。</div>
+        <div style="margin-top:8px"><b>力偶系</b>（只有力偶）$$ΣM=0$$一个方程。</div>
+        <div class="tip"><b>两个小技巧</b>　① 坐标轴尽量和某个未知力垂直，它在方程里就消失了，不用解方程组。② 算出来的力是负数，说明真实方向和假设相反，不用重算。</div>
+      </div>
+      <div class="prc wide">
+        <h3>3　四种常见的约束：把它们换成力</h3>
+        <p>画受力图时，要把绳子、支座、相连的杆拿掉，换成它们给物体的力。换成什么样的力，取决于约束的种类：</p>
+        <div class="cons">
+          ${fig(c1, '<b>绳索</b>只能拉，力沿绳子、背离物体。')}
+          ${fig(c2, '<b>固定铰支座、铰链</b>任何方向都能挡，方向事先不知道，一般拆成 $F_x$、$F_y$。')}
+          ${fig(c3, '<b>活动铰支座</b>（带滚轮）只挡垂直于支承面的方向，力垂直于支承面。')}
+          ${fig(c4, '<b>二力杆</b>两端铰接、中间不受力的杆，两个力等大反向，沿两铰连线。')}
+        </div>
+      </div>
+      <div class="prc">
+        <h3>4　力偶：只转不移</h3>
+        <svg viewBox="0 0 400 175">${cp}</svg>
+        <div style="font-size:14.5px;color:var(--ink2)">一对大小相等、方向相反、作用线平行但不重合的力叫<b>力偶</b>。它不让物体移动，只让物体转。转的效果用力偶矩表示：$$M=F·d$$逆时针取正，顺时针取负。</div>
+        <div class="tip"><b>关键结论</b>　力偶只能用力偶平衡。一个构件上如果只有一个力偶和两个约束力，这两个约束力一定等大、反向、平行，组成一个力偶。P36 的 4 道题全靠这一句。</div>
+      </div>
+      <div class="prc">
+        <h3>5　每道题都按这四步走</h3>
+        <ol class="four">
+          <li><b>选研究对象</b>：选哪个物体或哪个铰点来分析。优先选未知量不超过方程数的那个。</li>
+          <li><b>画受力图</b>：把它单独画出来，绳、杆、支座都换成力。先找二力杆。</li>
+          <li><b>建坐标、列方程</b>：汇交力系列 $ΣF_x=0$、$ΣF_y=0$；力偶系列 $ΣM=0$。</li>
+          <li><b>解方程、看正负</b>：负号表示实际方向和假设相反，最后写"答"。</li>
+        </ol>
+      </div>
+    </div>
+    <section class="blk"><h3>题目清单</h3>
+      <table class="sum"><tr><th>题号</th><th>内容</th><th>要求</th></tr>${items}</table>
+    </section>
+    <nav class="pn"><span></span><a href="#${PROBS[0].id}" style="text-align:right"><small>开始</small>${PROBS[0].nav} ${PROBS[0].short}</a></nav>
+  </article>`;
+}
+function drawProj(a) {
+  const ox = 50, oy = 186, L = 170, c = Math.cos(a * RAD), sn = Math.sin(a * RAD);
+  const [tx, ty] = pol(ox, oy, L, a);
+  let s = D.arrow(ox - 14, oy, 380, oy, { c: 'ax', h: 10, w: 4, l: 'x', lp: [390, oy + 5] }) + D.arrow(ox, oy + 14, ox, 14, { c: 'ax', h: 10, w: 4, l: 'y', lp: [ox + 14, 20] });
+  s += D.ln(tx, ty, tx, oy, 'dsh') + D.ln(tx, ty, ox, ty, 'dsh');
+  if (L * c > 18) s += D.arrow(ox, oy, tx, oy, { c: 'g', dash: 1, l: 'F_x', lp: [(ox + tx) / 2, oy + 24] });
+  if (L * sn > 18) s += D.arrow(ox, oy, ox, ty, { c: 'g', dash: 1, l: 'F_y', lp: [ox - 22, (oy + ty) / 2 + 5] });
+  s += D.arrow(ox, oy, tx, ty, { l: 'F', lp: [tx + 14, ty - 4] });
+  if (a > 3) s += D.arc(ox, oy, 42, 0, a, 'α', { lo: 13 });
+  return s;
+}
+function initIntro() {
+  const upd = () => {
+    const a = +$('#proj').value;
+    $('#projsvg').innerHTML = drawProj(a);
+    $('#projv').textContent = a + '°';
+    const c = Math.cos(a * RAD), sn = Math.sin(a * RAD);
+    $('#projro').innerHTML = T(`设 F = 100 N，α = ${a}°：$F_x=Fcosα$ = 100 × ${c.toFixed(3)} = <b>${(100 * c).toFixed(1)} N</b>，$F_y=Fsinα$ = 100 × ${sn.toFixed(3)} = <b>${(100 * sn).toFixed(1)} N</b>`);
+  };
+  $('#proj').addEventListener('input', upd);
+  upd();
+}
+function sumHTML() {
+  const rows = PROBS.map(p => `<tr><td><a href="#${p.id}">${p.nav}</a></td><td>${T(p.sum[0])}</td><td>${T(p.sum[1])}</td></tr>`).join('');
+  return `<article>
+    <div class="tag">最后</div>
+    <div class="ph"><h2>答案汇总</h2></div>
+    <p class="lead">${T('做完可以对一下。点题号回到讲解页。第 11 题按老师要求取 $F_1$ = 100 kN。')}</p>
+    <table class="sum"><tr><th>题号</th><th>求什么</th><th>答案</th></tr>${rows}</table>
+    <nav class="pn"><a href="#${PROBS[PROBS.length - 1].id}"><small>上一题</small>${PROBS[PROBS.length - 1].nav} ${PROBS[PROBS.length - 1].short}</a><a href="#intro" style="text-align:right"><small>回到</small>先看这页</a></nav>
+  </article>`;
+}
+function buildNav() {
+  const item = p => `<a href="#${p.id}" data-id="${p.id}"><span class="no">${p.nav}</span><span class="t">${p.short}</span></a>`;
+  const g1 = PROBS.filter(p => p.id.startsWith('p27')), g2 = PROBS.filter(p => p.id.startsWith('p36'));
+  $('#nav').innerHTML = `<a href="#intro" data-id="intro"><span class="no">0</span><span class="t">先看这页</span></a>
+    <h4>P27 平面汇交力系</h4>${g1.map(item).join('')}
+    <h4>P36 平面力偶系</h4>${g2.map(item).join('')}
+    <h4>最后</h4><a href="#sum" data-id="sum"><span class="no">✓</span><span class="t">答案汇总</span></a>`;
+}
+function route() {
+  stop();
+  const id = (location.hash || '#intro').slice(1);
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.id === id));
+  const p = PROBS.find(x => x.id === id);
+  S.p = null;
+  if (p) { S.p = p; S.vi = 0; S.cur = 0; renderProb(p); document.title = `${p.nav} ${p.short} · 工程力学作业讲解`; }
+  else if (id === 'sum') { $('#main').innerHTML = sumHTML(); document.title = '答案汇总 · 工程力学作业讲解'; }
+  else { $('#main').innerHTML = T(introHTML()); initIntro(); document.title = '工程力学作业讲解'; }
+  window.scrollTo(0, 0);
+  const on = document.querySelector('#nav a.on');
+  if (on && window.innerWidth <= 960) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+}
+function initTheme() {
+  const b = $('#theme'), modes = ['auto', 'dark', 'light'], names = { auto: '跟随系统', dark: '深色', light: '浅色' };
+  let m = 'auto';
+  try { m = localStorage.getItem('em-theme') || 'auto'; } catch (e) {}
+  const apply = () => { if (m === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', m); b.textContent = '主题：' + names[m]; };
+  b.onclick = () => { m = modes[(modes.indexOf(m) + 1) % 3]; try { localStorage.setItem('em-theme', m); } catch (e) {} apply(); };
+  apply();
+}
+buildNav();
+initTheme();
+window.addEventListener('hashchange', route);
+route();
+
+</script>
+</body>
+</html>
