@@ -19,7 +19,7 @@ function at(o) {
 }
 // 标签：F_AB → F 加下标
 function lab(t) {
-  return String(t).replace(/([A-Za-zθβγαφ])_\{([^}]*)\}|([A-Za-zθβγαφ])_([A-Za-z0-9′']+)/g,
+  return String(t).replace(/([A-Za-zθβγαφω][′']?)_\{([^}]*)\}|([A-Za-zθβγαφω][′']?)_([A-Za-z0-9′']+)/g,
     (m, a, b, c, d) => `${a || c}<tspan class="sb" dy="5">${b || d}</tspan><tspan dy="-5">​</tspan>`);
 }
 
@@ -55,7 +55,7 @@ function tex(s, up) {
       if (fm && !up) { out += `<i>${fm[1]}</i>${fm[2]}`; continue; }
       out += (w.length === 1 && !up) ? `<i>${w}</i>` : w; continue;
     }
-    if ('θβγαφ'.includes(c) && !up) { out += `<i>${c}</i>`; i++; continue; }
+    if ('θβγαφω'.includes(c) && !up) { out += `<i>${c}</i>`; i++; continue; }
     if (c === '=' && !up) { out += '=<wbr>'; i++; continue; }
     if (c === ' ') { out += '&nbsp;'; i++; continue; }
     if (c === '⇒') { out += '<wbr>⇒'; i++; continue; }
@@ -237,7 +237,7 @@ function renderProb(p) {
     <section class="blk" id="pitw"><h3>容易错的地方</h3><ul class="pit" id="pit"></ul></section>
     <nav class="pn">
       ${prev ? `<a href="#${prev.id}"><small>上一题</small>${prev.nav} ${prev.short}</a>` : `<a href="#intro"><small>上一页</small>先看这页</a>`}
-      ${next ? `<a href="#${next.id}" style="text-align:right"><small>下一题</small>${next.nav} ${next.short}</a>` : `<a href="#sum" style="text-align:right"><small>最后</small>答案汇总</a>`}
+      ${next && next.ch !== p.ch ? `<a href="#${CHAPTERS[next.ch].id}" style="text-align:right"><small>下一章</small>${CHAPTERS[next.ch].no} ${CHAPTERS[next.ch].name}</a>` : next ? `<a href="#${next.id}" style="text-align:right"><small>下一题</small>${next.nav} ${next.short}</a>` : `<a href="#sum" style="text-align:right"><small>最后</small>答案汇总</a>`}
     </nav>
     <div class="mbar"><button class="btn" id="mPrev">上一步</button><span class="mprog" id="mprog"></span><button class="btn pri" id="mNext">下一步</button></div>
   </article>`;
@@ -249,7 +249,7 @@ function renderProb(p) {
   $('#mPrev').onclick = () => { stop(); go(S.cur - 1); };
   $('#mNext').onclick = () => {
     stop();
-    if (S.cur < V().steps.length - 1) go(S.cur + 1);
+    if (S.cur < allSteps(V()).length - 1) go(S.cur + 1);
     else { const nx = PROBS[PROBS.indexOf(S.p) + 1]; location.hash = nx ? nx.id : 'sum'; }
   };
   $('#bAll').onclick = () => { const el = $('#steps'); el.classList.toggle('all'); $('#bAll').textContent = el.classList.contains('all') ? '只看当前步' : '展开全部步骤'; };
@@ -269,15 +269,17 @@ function V() { return S.p.variants[S.vi]; }
 function pick(k) { const v = V(); return v[k] != null ? v[k] : S.p[k]; }
 
 function renderVariant() {
+  stopAnim();
   const v = V();
   document.querySelectorAll('.vtabs button').forEach(b => b.classList.toggle('on', +b.dataset.vi === S.vi));
   S.params = {};
   for (const k in (v.params || {})) S.params[k] = v.params[k].val;
+  S.balShown = -1;
   drawSVG(true);
   // 步骤
-  $('#steps').innerHTML = v.steps.map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
+  $('#steps').innerHTML = allSteps(v).map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
   document.querySelectorAll('#steps li').forEach(li => li.onclick = () => { stop(); go(+li.dataset.i); });
-  $('#dots').innerHTML = v.steps.map((_, i) => `<i data-i="${i}" title="第 ${i} 步"></i>`).join('');
+  $('#dots').innerHTML = allSteps(v).map((_, i) => `<i data-i="${i}" title="第 ${i} 步"></i>`).join('');
   document.querySelectorAll('#dots i').forEach(d => d.onclick = () => { stop(); go(+d.dataset.i); });
   // 滑块与工具
   let c = '';
@@ -286,10 +288,11 @@ function renderVariant() {
     c += `<label><span>${pm.label}</span><span id="pv_${k}">${pm.fmt(pm.val)}</span></label><input type="range" id="pr_${k}" min="${pm.min}" max="${pm.max}" step="${pm.step}" value="${pm.val}">`;
   }
   if (v.readout) c += `<div class="readout" id="readout"></div>`;
-  if (v.tools) c += `<div style="display:flex;gap:8px">${v.tools.map((t, i) => `<button class="btn" data-tool="${i}">${t.label}</button>`).join('')}</div>`;
+  if (v.tools) c += `<div style="display:flex;gap:8px">${v.tools.map((t, i) => `<button class="btn${t.id ? ' pri' : ''}" data-tool="${i}"${t.id ? ` id="${t.id}"` : ''}>${t.label}</button>`).join('')}</div>`;
   $('#ctrl').innerHTML = c;
   for (const k in (v.params || {})) {
     $('#pr_' + k).addEventListener('input', e => {
+      stopAnim();
       S.params[k] = +e.target.value;
       $('#pv_' + k).textContent = v.params[k].fmt(S.params[k]);
       drawSVG(true); updReadout();
@@ -303,6 +306,7 @@ function renderVariant() {
   $('#pitw').style.display = pit.length ? '' : 'none';
   $('#pit').innerHTML = pit.map(x => `<li>${T(x)}</li>`).join('');
   go(S.cur, true);
+  if (v.anim && v.anim.auto) startAnim();
 }
 
 function updReadout() { const v = V(); if (v.readout && $('#readout')) $('#readout').innerHTML = T(v.readout(S.params)); }
@@ -316,7 +320,7 @@ function fitBox(v) {
   document.body.appendChild(m);
   const base = {}; for (const k in (v.params || {})) base[k] = v.params[k].val;
   const sets = [base];
-  for (const k in (v.params || {})) { sets.push(Object.assign({}, base, { [k]: v.params[k].min }), Object.assign({}, base, { [k]: v.params[k].max })); }
+  for (const k in (v.params || {})) { const pm = v.params[k]; for (let i = 0; i <= 8; i++) sets.push(Object.assign({}, base, { [k]: pm.min + (pm.max - pm.min) * i / 8 })); }
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const ps of sets) {
     m.innerHTML = '<g>' + v.svg(ps) + '</g>';
@@ -330,6 +334,7 @@ function fitBox(v) {
 }
 
 function drawSVG(instant) {
+  if (S.balShown >= 0) return; // 正在显示受力平衡图
   const v = V();
   const vb = v.vb || fitBox(v);
   $('#svgw').innerHTML = `<svg class="dg instant" viewBox="${vb}" xmlns="http://www.w3.org/2000/svg">${v.svg(S.params)}</svg>`;
@@ -349,10 +354,12 @@ function applyStep(instant) {
 }
 
 function go(i, instant) {
-  const n = V().steps.length;
+  const n = allSteps(V()).length, nf = V().steps.length;
   i = Math.max(0, Math.min(n - 1, i));
   S.cur = i;
-  applyStep(instant);
+  const want = i >= nf ? i - nf : -1;
+  if (want !== S.balShown) { S.balShown = want; if (want < 0) drawSVG(true); else drawBal(want); }
+  else if (want < 0) applyStep(instant);
   document.querySelectorAll('#steps li').forEach(li => { const k = +li.dataset.i; li.classList.toggle('on', k === i); li.classList.toggle('later', k > i); });
   document.querySelectorAll('#dots i').forEach(d => d.classList.toggle('on', +d.dataset.i <= i));
   $('#stepno').textContent = `${i} / ${n - 1}`;
@@ -379,9 +386,9 @@ function go(i, instant) {
 
 function togglePlay() {
   if (S.timer) { stop(); return; }
-  if (S.cur >= V().steps.length - 1) go(0);
+  if (S.cur >= allSteps(V()).length - 1) go(0);
   $('#bPlay').textContent = '停止播放';
-  S.timer = setInterval(() => { if (S.cur >= V().steps.length - 1) { stop(); return; } go(S.cur + 1); }, 4200);
+  S.timer = setInterval(() => { if (S.cur >= allSteps(V()).length - 1) { stop(); return; } go(S.cur + 1); }, 4200);
 }
 function stop() { if (S.timer) { clearInterval(S.timer); S.timer = null; } const b = $('#bPlay'); if (b) b.textContent = '自动播放'; }
 

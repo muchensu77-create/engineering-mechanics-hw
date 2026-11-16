@@ -35,6 +35,8 @@ button{font:inherit;color:inherit}
 .side h4{font:600 12px var(--sans);color:var(--muted);letter-spacing:.1em;margin:18px 22px 4px}
 .side a{display:flex;gap:8px;align-items:baseline;padding:6px 18px 6px 19px;color:var(--ink2);text-decoration:none;font-size:14px;border-left:3px solid transparent;line-height:1.5}
 .side a .no{font:600 13.5px var(--math);color:var(--muted);min-width:22px}
+.side a.chl .t{color:var(--muted);font-size:13px}
+.side a.chl .no{font-family:var(--sans);font-size:12.5px}
 .side a:hover{background:var(--soft)}
 .side a.on{background:var(--soft);border-left-color:var(--known);color:var(--ink)}
 .side a.on .no{color:var(--known)}
@@ -182,6 +184,32 @@ sub,sup{font-size:.7em;line-height:0}
 .cpl{stroke:var(--fc);fill:none;stroke-width:2.4}
 .cplh{fill:var(--fc)}
 .cplt{fill:var(--fc)}
+
+/* 第三、四章图元 */
+.ql{--fc:var(--known)}
+.ql line{stroke:var(--known);stroke-width:1.5}
+.ql path{fill:var(--known)}
+.ql .lb{fill:var(--known)}
+.bar{stroke:var(--ink);stroke-width:3.2;stroke-linecap:round}
+.bar.zero{stroke:var(--geo);stroke-width:2.2;stroke-dasharray:7 5}
+.bar.hotbar{stroke:var(--hl);stroke-width:5}
+.mn{font:13px var(--math);fill:var(--ink2)}
+.zl{font:600 12.5px var(--sans);fill:var(--known)}
+.wedge{fill:color-mix(in srgb,var(--hl) 30%,transparent);stroke:none}
+.slot{stroke:var(--ink);stroke-width:12;fill:none;stroke-linecap:round}
+.slotI{stroke:var(--card);stroke-width:8;fill:none;stroke-linecap:round}
+.trace{stroke:var(--res);stroke-width:1.6;stroke-dasharray:5 4;fill:none}
+.cut{stroke:var(--known);stroke-width:1.8;stroke-dasharray:10 5;fill:none}
+
+
+/* 受力平衡图 */
+.balp .fly{transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .45s}
+.balp.pre .fly{transform:translate(var(--fx),var(--fy));opacity:0}
+.balp .late{transition:opacity .5s}
+.balp.pre .late{opacity:0}
+.bt{font:600 16px var(--sans);fill:var(--ink)}
+.bv{font:12.5px var(--sans);font-style:normal}
+.replay{font:13px var(--sans);fill:var(--unk);cursor:pointer;text-decoration:underline}
 
 /* 分步显隐 */
 [data-s]{opacity:0;transition:opacity .5s ease}
