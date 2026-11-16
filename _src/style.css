@@ -247,3 +247,64 @@ table.sum a:hover{color:var(--known)}
   .write{padding:12px 14px 12px 34px}
   .write::before{left:20px}
 }
+
+/* 手机端 */
+.khead,.shead,.mbar,.omore{display:none}
+.fr,.sqrt{white-space:nowrap}
+.measure [data-s]{opacity:1 !important;transform:none !important}
+@media (max-width: 960px){
+  body{font-size:15px}
+  main{overflow-x:clip;padding-bottom:130px}
+  .top h1{font-size:17px}
+  .tag{font-size:12px}
+  .orig{font-size:14px;padding-left:11px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:2px}
+  .orig.open{display:block}
+  .omore{display:inline-block;background:none;border:none;color:var(--unk);font-size:13px;padding:0 0 0 14px;margin:0 0 10px;cursor:pointer}
+  .given{font-size:14px}
+  .mx{white-space:normal}
+  .eq{white-space:normal;overflow-x:visible;font-size:16px;line-height:1.85;padding:6px 10px}
+  .wl{white-space:normal;overflow:visible}
+  .khead{display:block;font-size:12.5px;color:var(--muted);margin:16px 0 6px;letter-spacing:.04em}
+  .know{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:0 -16px 16px;padding:0 16px 4px;scrollbar-width:none}
+  .know::-webkit-scrollbar{display:none}
+  .kc{flex:0 0 84%;scroll-snap-align:center}
+  .fig{top:40px;box-shadow:0 1px 0 var(--rule)}
+  .fig svg.dg{max-height:44vh;margin:0 auto}
+  .figbar{display:none}
+  .vtabs button{padding:7px 4px;font-size:13.5px}
+  .ctrl{padding:6px 12px 8px;font-size:13px}
+  .readout{font-size:13px}
+  .shead{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);padding:0 2px}
+  .shead .btn{font-size:12.5px;padding:2px 10px}
+  .steps li{display:none;padding:12px 14px 14px;background:var(--card);border:1px solid var(--rule);cursor:default}
+  .steps li .n{display:none}
+  .steps li.on{display:block;border-left:3px solid var(--known);padding-left:14px}
+  .steps h4{font-size:16.5px;margin-bottom:4px}
+  .steps .bd{font-size:15px;line-height:1.85}
+  .steps.all li{display:block;padding:12px 14px 14px 50px;cursor:pointer}
+  .steps.all li .n{display:block;left:12px;top:13px}
+  .steps.all li.on{padding-left:48px}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:10px;align-items:center;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--rule)}
+  .mbar .btn{flex:1;height:46px;font-size:16px;touch-action:manipulation}
+  .mprog{display:flex;gap:4px;flex:0 0 auto}
+  .mprog i{width:7px;height:7px;background:var(--rule)}
+  .mprog i.on{background:var(--known)}
+  .write{background-image:none}
+  .wl{line-height:1.9;min-height:0;padding:3px 0}
+  .dg .lb{font-size:20px}
+  .dg .lb .sb{font-size:14px}
+  .dg .vl{font-size:14px}
+  .dg .nt{font-size:14.5px}
+  .dg .arcT{font-size:16.5px}
+  .dg .pt{font-size:19px}
+  .dg .dmt{font-size:18px}
+  .arw line{stroke-width:3}
+  .pr{gap:12px}
+  .prc{padding:14px 14px 16px}
+  table.sum{font-size:13.5px}
+  table.sum th,table.sum td{padding:7px 8px}
+}
+@media (max-width: 960px) and (max-height: 520px){
+  .fig{position:static}
+  .fig svg.dg{max-height:80vh}
+}

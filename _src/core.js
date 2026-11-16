@@ -56,6 +56,9 @@ function tex(s, up) {
       out += (w.length === 1 && !up) ? `<i>${w}</i>` : w; continue;
     }
     if ('θβγαφ'.includes(c) && !up) { out += `<i>${c}</i>`; i++; continue; }
+    if (c === '=' && !up) { out += '=<wbr>'; i++; continue; }
+    if (c === ' ') { out += '&nbsp;'; i++; continue; }
+    if (c === '⇒') { out += '<wbr>⇒'; i++; continue; }
     if (c === '-') { out += '−'; i++; continue; }
     if (c === '*') { out += '×'; i++; continue; }
     if (c === '<') { out += '&lt;'; i++; continue; }
@@ -207,9 +210,10 @@ function renderProb(p) {
     <div class="ph">
       <div class="tag">${p.tag}</div>
       <h2>${p.title}</h2>
-      <div class="orig">${T(p.orig)}</div>
+      <div class="orig" id="orig">${T(p.orig)}</div><button class="omore" id="omore">展开原题</button>
       <div class="given"><b>已知</b><div>${T(p.given)}</div><b>要求</b><div>${T(p.ask)}</div></div>
     </div>
+    <div class="khead">先搞懂这几个概念（左右滑动）</div>
     <div class="know">${p.know.map(k => `<div class="kc"><h5>${k[0]}</h5><p>${T(k[1])}</p></div>`).join('')}</div>
     <div class="stage">
       <div class="fig" id="fig">
@@ -225,6 +229,7 @@ function renderProb(p) {
         <div class="ctrl" id="ctrl"></div>
         ${legendHTML()}
       </div>
+      <div class="shead"><span id="shno"></span><button class="btn" id="bAll">展开全部步骤</button></div>
       <ol class="steps" id="steps"></ol>
     </div>
     <section class="blk"><h3>作业本上这样写 <button class="btn" id="bCopy">复制文字</button></h3><div class="write" id="write"></div></section>
@@ -234,11 +239,28 @@ function renderProb(p) {
       ${prev ? `<a href="#${prev.id}"><small>上一题</small>${prev.nav} ${prev.short}</a>` : `<a href="#intro"><small>上一页</small>先看这页</a>`}
       ${next ? `<a href="#${next.id}" style="text-align:right"><small>下一题</small>${next.nav} ${next.short}</a>` : `<a href="#sum" style="text-align:right"><small>最后</small>答案汇总</a>`}
     </nav>
+    <div class="mbar"><button class="btn" id="mPrev">上一步</button><span class="mprog" id="mprog"></span><button class="btn pri" id="mNext">下一步</button></div>
   </article>`;
   $('#bPrev').onclick = () => go(S.cur - 1);
   $('#bNext').onclick = () => go(S.cur + 1);
   $('#bPlay').onclick = togglePlay;
   $('#bCopy').onclick = copyWrite;
+  $('#omore').onclick = () => { const o = $('#orig'); o.classList.toggle('open'); $('#omore').textContent = o.classList.contains('open') ? '收起原题' : '展开原题'; };
+  $('#mPrev').onclick = () => { stop(); go(S.cur - 1); };
+  $('#mNext').onclick = () => {
+    stop();
+    if (S.cur < V().steps.length - 1) go(S.cur + 1);
+    else { const nx = PROBS[PROBS.indexOf(S.p) + 1]; location.hash = nx ? nx.id : 'sum'; }
+  };
+  $('#bAll').onclick = () => { const el = $('#steps'); el.classList.toggle('all'); $('#bAll').textContent = el.classList.contains('all') ? '只看当前步' : '展开全部步骤'; };
+  // 在图上左右滑动翻步
+  let tx = null, ty = 0;
+  $('#svgw').addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  $('#svgw').addEventListener('touchend', e => {
+    if (tx == null) return;
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
+    if (Math.abs(dx) > 45 && Math.abs(dy) < 50) { stop(); go(S.cur + (dx < 0 ? 1 : -1)); }
+  }, { passive: true });
   document.querySelectorAll('.vtabs button').forEach(b => b.onclick = () => { stop(); S.vi = +b.dataset.vi; S.cur = 0; renderVariant(); });
   renderVariant();
 }
@@ -285,9 +307,31 @@ function renderVariant() {
 
 function updReadout() { const v = V(); if (v.readout && $('#readout')) $('#readout').innerHTML = T(v.readout(S.params)); }
 
+// 量出整张图（所有步骤、滑块两端）的范围，裁掉四周空白
+function fitBox(v) {
+  if (v._fit) return v._fit;
+  const ns = 'http://www.w3.org/2000/svg', m = document.createElementNS(ns, 'svg');
+  m.setAttribute('class', 'dg measure'); m.setAttribute('viewBox', '0 0 640 460');
+  m.style.cssText = 'position:absolute;left:-9999px;top:0;width:640px;height:460px;visibility:hidden';
+  document.body.appendChild(m);
+  const base = {}; for (const k in (v.params || {})) base[k] = v.params[k].val;
+  const sets = [base];
+  for (const k in (v.params || {})) { sets.push(Object.assign({}, base, { [k]: v.params[k].min }), Object.assign({}, base, { [k]: v.params[k].max })); }
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const ps of sets) {
+    m.innerHTML = '<g>' + v.svg(ps) + '</g>';
+    const b = m.firstChild.getBBox();
+    x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+  }
+  m.remove();
+  const pad = 12;
+  if (!(x1 > x0)) return (v._fit = '0 0 640 460');
+  return (v._fit = `${f(x0 - pad)} ${f(y0 - pad)} ${f(x1 - x0 + 2 * pad)} ${f(y1 - y0 + 2 * pad)}`);
+}
+
 function drawSVG(instant) {
   const v = V();
-  const vb = v.vb || '0 0 640 460';
+  const vb = v.vb || fitBox(v);
   $('#svgw').innerHTML = `<svg class="dg instant" viewBox="${vb}" xmlns="http://www.w3.org/2000/svg">${v.svg(S.params)}</svg>`;
   applyStep(true);
 }
@@ -314,11 +358,21 @@ function go(i, instant) {
   $('#stepno').textContent = `${i} / ${n - 1}`;
   $('#bPrev').disabled = i === 0;
   $('#bNext').disabled = i === n - 1;
+  $('#shno').textContent = `第 ${i} 步 / 共 ${n - 1} 步`;
+  $('#mprog').innerHTML = Array.from({ length: n }, (_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('');
+  $('#mPrev').disabled = i === 0;
+  $('#mNext').textContent = i === n - 1 ? (PROBS[PROBS.indexOf(S.p) + 1] ? '下一题' : '答案汇总') : '下一步';
   if (!instant) {
     const li = document.querySelector('#steps li.on');
     if (li) {
-      const r = li.getBoundingClientRect(), figB = window.innerWidth <= 960 ? $('#fig').getBoundingClientRect().bottom : 0;
-      if (r.top < figB + 8 || r.bottom > window.innerHeight - 8) window.scrollBy({ top: r.top - figB - 16, behavior: 'smooth' });
+      const r = li.getBoundingClientRect(), mobile = window.innerWidth <= 960;
+      const figB = mobile && getComputedStyle($('#fig')).position === 'sticky' ? $('#fig').getBoundingClientRect().bottom : 0;
+      if (mobile && !$('#steps').classList.contains('all')) {
+        // 手机上只显示当前步：新的一步从图下方开始读
+        const figT = $('#fig').getBoundingClientRect().top, stickTop = parseFloat(getComputedStyle($('#fig')).top) || 0;
+        if (figB && figT > stickTop + 2) window.scrollBy({ top: figT - stickTop, behavior: 'smooth' }); // 图还没到顶：先把图推到顶上固定
+        else if (r.top < figB + 4) window.scrollBy({ top: r.top - figB - 10, behavior: 'smooth' });
+      } else if (r.top < figB + 8 || r.bottom > window.innerHeight - 8) window.scrollBy({ top: r.top - figB - 16, behavior: 'smooth' });
     }
   }
 }
