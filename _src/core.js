@@ -277,8 +277,9 @@ function renderVariant() {
   S.balShown = -1;
   drawSVG(true);
   // 步骤
-  $('#steps').innerHTML = allSteps(v).map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
+  $('#steps').innerHTML = allSteps(v).map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><button class="stuck${isStuck(i) ? ' on' : ''}" data-i="${i}">${isStuck(i) ? '已标记' : '没看懂'}</button><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
   document.querySelectorAll('#steps li').forEach(li => li.onclick = () => { stop(); go(+li.dataset.i); });
+  document.querySelectorAll('#steps .stuck').forEach(b => b.onclick = e => { e.stopPropagation(); toggleStuck(+b.dataset.i, b); });
   $('#dots').innerHTML = allSteps(v).map((_, i) => `<i data-i="${i}" title="第 ${i} 步"></i>`).join('');
   document.querySelectorAll('#dots i').forEach(d => d.onclick = () => { stop(); go(+d.dataset.i); });
   // 滑块与工具
@@ -300,8 +301,10 @@ function renderVariant() {
   }
   if (v.tools) document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => v.tools[+b.dataset.tool].on($('#svgw'), b));
   updReadout();
-  $('#write').innerHTML = (pick('write') || []).map(l => typeof l === 'string' ? `<div class="wl">${T(l)}</div>` : `<div class="wl zh">${T(l[0])}</div>`).join('');
-  $('#ans').innerHTML = `<b>答案</b>${T(pick('ans'))}`;
+  const lk = lockInfo(S.p.id);
+  $('#write').innerHTML = lk ? `<div class="wl zh locked">${lk}</div>` : (pick('write') || []).map(l => typeof l === 'string' ? `<div class="wl">${T(l)}</div>` : `<div class="wl zh">${T(l[0])}</div>`).join('');
+  $('#bCopy').style.display = lk ? 'none' : '';
+  $('#ans').innerHTML = `<b>答案</b>${lk ? `<span class="locked">${lk}</span>` : T(pick('ans'))}`;
   const pit = pick('pit') || [];
   $('#pitw').style.display = pit.length ? '' : 'none';
   $('#pit').innerHTML = pit.map(x => `<li>${T(x)}</li>`).join('');
@@ -356,6 +359,7 @@ function applyStep(instant) {
 function go(i, instant) {
   const n = allSteps(V()).length, nf = V().steps.length;
   i = Math.max(0, Math.min(n - 1, i));
+  if (!instant || S.cur !== i || !TR.stepKey.startsWith(`${S.p.id}/${S.vi}/`)) trackStep(i);
   S.cur = i;
   const want = i >= nf ? i - nf : -1;
   if (want !== S.balShown) { S.balShown = want; if (want < 0) drawSVG(true); else drawBal(want); }

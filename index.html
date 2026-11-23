@@ -222,6 +222,12 @@ sub,sup{font-size:.7em;line-height:0}
 .bv{font:12.5px var(--sans);font-style:normal}
 .replay{font:13px var(--sans);fill:var(--unk);cursor:pointer;text-decoration:underline}
 
+/* 没看懂、定时开放 */
+.stuck{float:right;margin:1px 0 0 10px;background:none;border:1px solid var(--rule);color:var(--muted);font-size:12.5px;line-height:1.6;padding:1px 9px;cursor:pointer}
+.stuck:hover{border-color:var(--ink2);color:var(--ink2)}
+.stuck.on{border-color:var(--known);color:var(--known)}
+.locked{color:var(--muted)}
+
 /* 分步显隐 */
 [data-s]{opacity:0;transition:opacity .5s ease}
 [data-s].on{opacity:1}
@@ -361,6 +367,18 @@ table.sum a:hover{color:var(--known)}
   <main id="main"></main>
 </div>
 <script>
+/* ========== 配置 ========== */
+const CONFIG = {
+  // 百度统计的站点 id（统计代码 hm.js? 后面那串），留空就不统计
+  baiduId: '',
+  // 题号: 开放时间（北京时间）。到点前隐藏这道题的“作业本上这样写”和答案
+  lock: {
+    // 'p14-9': '2026-12-01 08:00',
+  },
+  // 网址带 ?view=teacher 时全部显示，也不记统计
+  teacherKey: 'teacher'
+};
+
 'use strict';
 /* ========== 数学与格式 ========== */
 const RAD = Math.PI / 180;
@@ -640,8 +658,9 @@ function renderVariant() {
   S.balShown = -1;
   drawSVG(true);
   // 步骤
-  $('#steps').innerHTML = allSteps(v).map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
+  $('#steps').innerHTML = allSteps(v).map((st, i) => `<li data-i="${i}"><span class="n">${i}</span><button class="stuck${isStuck(i) ? ' on' : ''}" data-i="${i}">${isStuck(i) ? '已标记' : '没看懂'}</button><h4>${T(st[0])}</h4><div class="bd">${T(st[1])}</div></li>`).join('');
   document.querySelectorAll('#steps li').forEach(li => li.onclick = () => { stop(); go(+li.dataset.i); });
+  document.querySelectorAll('#steps .stuck').forEach(b => b.onclick = e => { e.stopPropagation(); toggleStuck(+b.dataset.i, b); });
   $('#dots').innerHTML = allSteps(v).map((_, i) => `<i data-i="${i}" title="第 ${i} 步"></i>`).join('');
   document.querySelectorAll('#dots i').forEach(d => d.onclick = () => { stop(); go(+d.dataset.i); });
   // 滑块与工具
@@ -663,8 +682,10 @@ function renderVariant() {
   }
   if (v.tools) document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => v.tools[+b.dataset.tool].on($('#svgw'), b));
   updReadout();
-  $('#write').innerHTML = (pick('write') || []).map(l => typeof l === 'string' ? `<div class="wl">${T(l)}</div>` : `<div class="wl zh">${T(l[0])}</div>`).join('');
-  $('#ans').innerHTML = `<b>答案</b>${T(pick('ans'))}`;
+  const lk = lockInfo(S.p.id);
+  $('#write').innerHTML = lk ? `<div class="wl zh locked">${lk}</div>` : (pick('write') || []).map(l => typeof l === 'string' ? `<div class="wl">${T(l)}</div>` : `<div class="wl zh">${T(l[0])}</div>`).join('');
+  $('#bCopy').style.display = lk ? 'none' : '';
+  $('#ans').innerHTML = `<b>答案</b>${lk ? `<span class="locked">${lk}</span>` : T(pick('ans'))}`;
   const pit = pick('pit') || [];
   $('#pitw').style.display = pit.length ? '' : 'none';
   $('#pit').innerHTML = pit.map(x => `<li>${T(x)}</li>`).join('');
@@ -719,6 +740,7 @@ function applyStep(instant) {
 function go(i, instant) {
   const n = allSteps(V()).length, nf = V().steps.length;
   i = Math.max(0, Math.min(n - 1, i));
+  if (!instant || S.cur !== i || !TR.stepKey.startsWith(`${S.p.id}/${S.vi}/`)) trackStep(i);
   S.cur = i;
   const want = i >= nf ? i - nf : -1;
   if (want !== S.balShown) { S.balShown = want; if (want < 0) drawSVG(true); else drawBal(want); }
@@ -767,6 +789,61 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') { stop(); go(S.cur + 1); }
   if (e.key === 'ArrowLeft') { stop(); go(S.cur - 1); }
 });
+
+/* ========== 定时开放、匿名统计、“没看懂”标记 ========== */
+const TEACHER = new URLSearchParams(location.search).get('view') === CONFIG.teacherKey;
+
+// 未到开放时间返回“12月1日 08:00 开放”，已开放返回 null
+function lockInfo(id) {
+  const t = CONFIG.lock[id];
+  if (TEACHER || !t) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})$/.exec(t);
+  if (!m) return null;
+  if (Date.now() >= new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:00+08:00`).getTime()) return null;
+  return `${+m[2]}月${+m[3]}日 ${m[4]} 开放`;
+}
+
+// 统计：只记题号、步骤和次数，不记任何个人信息
+const TR = { seen: new Set(), stepAt: 0, stepKey: '' };
+function track(action, label, value) {
+  if (!CONFIG.baiduId || TEACHER) return;
+  const ev = ['_trackEvent', '讲解页', action, label];
+  if (value != null) ev.push(Math.round(value));
+  (window._hmt = window._hmt || []).push(ev);
+}
+function trackPage() {
+  if (!CONFIG.baiduId || TEACHER) return;
+  (window._hmt = window._hmt || []).push(['_trackPageview', location.pathname + location.hash]);
+}
+// 换步时记：到过哪一步（每次打开页面同一步只记一次），在上一步停了多久
+function trackStep(i) {
+  if (!S.p) return;
+  const key = `${S.p.id}/${S.vi}`, now = Date.now();
+  if (TR.stepKey && TR.stepAt) {
+    const sec = (now - TR.stepAt) / 1000;
+    if (sec > 3) track('停留秒数', TR.stepKey, Math.min(sec, 600));
+  }
+  TR.stepKey = `${key}/${i}`; TR.stepAt = now;
+  if (!TR.seen.has(TR.stepKey)) { TR.seen.add(TR.stepKey); track('到达步骤', TR.stepKey); }
+}
+
+// “没看懂”：本机记住按过哪些步，第一次按时上报
+const stuckKey = i => `em-stuck:${S.p.id}/${S.vi}/${i}`;
+function isStuck(i) { try { return localStorage.getItem(stuckKey(i)) === '1'; } catch (e) { return false; } }
+function toggleStuck(i, btn) {
+  const on = !isStuck(i);
+  try { if (on) localStorage.setItem(stuckKey(i), '1'); else localStorage.removeItem(stuckKey(i)); } catch (e) {}
+  btn.classList.toggle('on', on);
+  btn.textContent = on ? '已标记' : '没看懂';
+  if (on) track('没看懂', `${S.p.id}/${S.vi}/${i}`);
+}
+
+if (CONFIG.baiduId && !TEACHER) {
+  window._hmt = window._hmt || [];
+  const sc = document.createElement('script');
+  sc.src = 'https://hm.baidu.com/hm.js?' + CONFIG.baiduId;
+  document.head.appendChild(sc);
+}
 
 /* ========== 第三、四章用到的图元和动画 ========== */
 // 均布载荷：x1..x2，y 为梁上表面
@@ -2884,7 +2961,7 @@ function initIntro() {
 }
 function sumHTML() {
   const rows = CHAPTERS.map((c, ci) => `<tr><th colspan="3" style="background:var(--bg);color:var(--ink);font-size:14px">${c.no} ${c.name}<span style="color:var(--muted);font-weight:400">　${c.src}</span></th></tr>` +
-    probsOf(ci).map(p => `<tr><td><a href="#${p.id}">${p.nav}</a></td><td>${T(p.sum[0])}</td><td>${T(p.sum[1])}</td></tr>`).join('')).join('');
+    probsOf(ci).map(p => `<tr><td><a href="#${p.id}">${p.nav}</a></td><td>${T(p.sum[0])}</td><td>${lockInfo(p.id) ? `<span class="locked">${lockInfo(p.id)}</span>` : T(p.sum[1])}</td></tr>`).join('')).join('');
   const last = PROBS[PROBS.length - 1];
   return `<article>
     <div class="tag">最后</div>
@@ -2907,7 +2984,8 @@ function route() {
   document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.id === id));
   const p = PROBS.find(x => x.id === id);
   S.p = null;
-  if (p) { S.p = p; S.vi = 0; S.cur = 0; renderProb(p); document.title = `${p.nav} ${p.short} · 工程力学作业讲解`; }
+  trackPage();
+  if (p) { S.p = p; S.vi = 0; S.cur = 0; track('打开题目', p.id); renderProb(p); document.title = `${p.nav} ${p.short} · 工程力学作业讲解`; }
   else if (id === 'sum') { $('#main').innerHTML = sumHTML(); document.title = '答案汇总 · 工程力学作业讲解'; }
   else if (CHAPTERS.some(c => c.id === id)) { const ci = CHAPTERS.findIndex(c => c.id === id); $('#main').innerHTML = chapterHTML(ci); document.title = `${CHAPTERS[ci].no} ${CHAPTERS[ci].name} · 工程力学作业讲解`; }
   else { $('#main').innerHTML = T(introHTML()); initIntro(); document.title = '工程力学作业讲解'; }

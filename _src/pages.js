@@ -114,7 +114,7 @@ function initIntro() {
 }
 function sumHTML() {
   const rows = CHAPTERS.map((c, ci) => `<tr><th colspan="3" style="background:var(--bg);color:var(--ink);font-size:14px">${c.no} ${c.name}<span style="color:var(--muted);font-weight:400">　${c.src}</span></th></tr>` +
-    probsOf(ci).map(p => `<tr><td><a href="#${p.id}">${p.nav}</a></td><td>${T(p.sum[0])}</td><td>${T(p.sum[1])}</td></tr>`).join('')).join('');
+    probsOf(ci).map(p => `<tr><td><a href="#${p.id}">${p.nav}</a></td><td>${T(p.sum[0])}</td><td>${lockInfo(p.id) ? `<span class="locked">${lockInfo(p.id)}</span>` : T(p.sum[1])}</td></tr>`).join('')).join('');
   const last = PROBS[PROBS.length - 1];
   return `<article>
     <div class="tag">最后</div>
@@ -137,7 +137,8 @@ function route() {
   document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.id === id));
   const p = PROBS.find(x => x.id === id);
   S.p = null;
-  if (p) { S.p = p; S.vi = 0; S.cur = 0; renderProb(p); document.title = `${p.nav} ${p.short} · 工程力学作业讲解`; }
+  trackPage();
+  if (p) { S.p = p; S.vi = 0; S.cur = 0; track('打开题目', p.id); renderProb(p); document.title = `${p.nav} ${p.short} · 工程力学作业讲解`; }
   else if (id === 'sum') { $('#main').innerHTML = sumHTML(); document.title = '答案汇总 · 工程力学作业讲解'; }
   else if (CHAPTERS.some(c => c.id === id)) { const ci = CHAPTERS.findIndex(c => c.id === id); $('#main').innerHTML = chapterHTML(ci); document.title = `${CHAPTERS[ci].no} ${CHAPTERS[ci].name} · 工程力学作业讲解`; }
   else { $('#main').innerHTML = T(introHTML()); initIntro(); document.title = '工程力学作业讲解'; }

@@ -211,6 +211,12 @@ sub,sup{font-size:.7em;line-height:0}
 .bv{font:12.5px var(--sans);font-style:normal}
 .replay{font:13px var(--sans);fill:var(--unk);cursor:pointer;text-decoration:underline}
 
+/* 没看懂、定时开放 */
+.stuck{float:right;margin:1px 0 0 10px;background:none;border:1px solid var(--rule);color:var(--muted);font-size:12.5px;line-height:1.6;padding:1px 9px;cursor:pointer}
+.stuck:hover{border-color:var(--ink2);color:var(--ink2)}
+.stuck.on{border-color:var(--known);color:var(--known)}
+.locked{color:var(--muted)}
+
 /* 分步显隐 */
 [data-s]{opacity:0;transition:opacity .5s ease}
 [data-s].on{opacity:1}
